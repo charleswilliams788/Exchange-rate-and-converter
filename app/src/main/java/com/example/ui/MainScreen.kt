@@ -220,19 +220,27 @@ fun MainScreen(
                         )
                     }
 
-                    // Sign Out button if user is authenticated
-                    if (walletUiState.currentUser != null) {
+                    // Sign Out / Switch account button if active
+                    if (walletUiState.userAccount != null) {
                         IconButton(
                             onClick = {
-                                AuthHelper.signOut(
-                                    credentialManager = credentialManager,
-                                    onSignOutComplete = {
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("Signed out successfully")
-                                        }
-                                    },
-                                    scope = coroutineScope
-                                )
+                                if (walletUiState.currentUser != null) {
+                                    AuthHelper.signOut(
+                                        credentialManager = credentialManager,
+                                        onSignOutComplete = {
+                                            walletViewModel.clearAccount()
+                                            coroutineScope.launch {
+                                                snackbarHostState.showSnackbar("Signed out successfully")
+                                            }
+                                        },
+                                        scope = coroutineScope
+                                    )
+                                } else {
+                                    walletViewModel.clearAccount()
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Switched to sign in view")
+                                    }
+                                }
                             },
                             modifier = Modifier.testTag("btn_sign_out")
                         ) {
@@ -415,7 +423,7 @@ fun MainScreen(
                         val user = walletUiState.currentUser
                         val account = walletUiState.userAccount
 
-                        if (user == null || account == null) {
+                        if (account == null) {
                             item {
                                 GoogleSignInCard(
                                     isLoading = walletUiState.isAuthLoading,
@@ -438,6 +446,9 @@ fun MainScreen(
                                             },
                                             scope = coroutineScope
                                         )
+                                    },
+                                    onDemoClick = {
+                                        walletViewModel.useDemoAccount()
                                     }
                                 )
                             }
@@ -461,7 +472,7 @@ fun MainScreen(
                             item {
                                 AccountTransactionsList(
                                     transactions = walletUiState.transactions,
-                                    currentUserId = user.uid
+                                    currentUserId = user?.uid ?: account.userId
                                 )
                             }
                         }

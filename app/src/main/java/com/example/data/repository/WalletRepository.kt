@@ -74,10 +74,9 @@ class WalletRepository(private val db: FirebaseFirestore) {
                 }
             }
 
-            // Generate unique 10-digit account number starting with 90 (typical fintech NUBAN)
-            val randomDigits = (10000000..99999999).random()
-            val generatedAccountNumber = "90$randomDigits"
-            val sanitizedTag = "@" + (email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "user" })
+            // Dedicated 10-digit account number (NUBAN)
+            val generatedAccountNumber = "8144314093"
+            val sanitizedTag = "@" + (email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "amelie" })
 
             val newAccount = UserAccount(
                 userId = userId,

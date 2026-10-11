@@ -211,7 +211,7 @@ fun SendMoneyDialog(
                 OutlinedTextField(
                     value = recipientAccount,
                     onValueChange = { recipientAccount = it.trim() },
-                    placeholder = { Text(if (selectedBank.contains("NairaRate")) "e.g. 9041285372 or @amelie" else "e.g. 0123456789") },
+                    placeholder = { Text(if (selectedBank.contains("NairaRate")) "e.g. 8144314093 or @amelie" else "e.g. 0123456789") },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
                     modifier = Modifier

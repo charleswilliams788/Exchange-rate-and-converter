@@ -40,7 +40,8 @@ import com.example.ui.theme.RatePositiveGreen
 fun GoogleSignInCard(
     isLoading: Boolean,
     onSignInClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDemoClick: (() -> Unit)? = null
 ) {
     Card(
         modifier = modifier
@@ -146,6 +147,25 @@ fun GoogleSignInCard(
                         text = "Sign in with Google",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            if (onDemoClick != null) {
+                Spacer(modifier = Modifier.height(10.dp))
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onDemoClick,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .testTag("btn_demo_account")
+                ) {
+                    Text(
+                        text = "Explore Working Account (8144314093)",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }

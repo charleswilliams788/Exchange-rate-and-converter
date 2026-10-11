@@ -33,6 +33,6 @@ This directory (`/docs`) contains the pure web browser version of **NairaRate**.
 - **Cash & Banknote Breakdown**: Computes exact payout in ₦1,000, ₦500 notes and ₦100k bundles.
 - **Working Account**: Dual NGN & USD balances with local storage persistence.
 - **Send Money**: Send NGN or USD to Nigerian banks or P2P tags with real-time conversion previews.
-- **Receive Money**: Dedicated account number (`9041285372`), simulated QR code, and one-tap copy.
+- **Receive Money**: Dedicated account number (`8144314093`), simulated QR code, and one-tap copy.
 - **In-Wallet Conversion**: Convert between USD and NGN balances at market rates.
 - **Transaction Stream**: Real-time log of sent, received, and converted funds.
