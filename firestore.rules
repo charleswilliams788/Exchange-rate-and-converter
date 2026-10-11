@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.userId is string &&
+             data.accountNumber is string &&
+             data.accountTag is string &&
+             data.ngnBalance is number &&
+             data.usdBalance is number;
+    }
+
+    function isValidTransaction(data) {
+      return data.senderId is string &&
+             data.recipientAccount is string &&
+             data.amount is number &&
+             data.amount > 0 &&
+             data.currency in ['USD', 'NGN'] &&
+             data.type in ['SEND', 'RECEIVE', 'CONVERT', 'DEPOSIT'] &&
+             data.participants is list;
+    }
+
+    // User accounts
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false;
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && (request.auth.uid in resource.data.participants);
+      allow create: if isAuthenticated() && 
+                    request.resource.data.senderId == request.auth.uid &&
+                    (request.auth.uid in request.resource.data.participants) &&
+                    isValidTransaction(request.resource.data);
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

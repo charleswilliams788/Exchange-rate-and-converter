@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with Naira and Dollar working account balances",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "accountNumber": { "type": "string" },
+        "accountTag": { "type": "string" },
+        "bankName": { "type": "string" },
+        "ngnBalance": { "type": "number" },
+        "usdBalance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "accountNumber", "accountTag", "ngnBalance", "usdBalance"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Transfer and exchange transaction record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderAccount": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "recipientAccount": { "type": "string" },
+        "recipientBank": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "enum": ["USD", "NGN"] },
+        "exchangeRate": { "type": "number" },
+        "convertedAmount": { "type": "number" },
+        "convertedCurrency": { "type": "string", "enum": ["USD", "NGN"] },
+        "type": { "type": "string", "enum": ["SEND", "RECEIVE", "CONVERT", "DEPOSIT"] },
+        "status": { "type": "string", "enum": ["COMPLETED", "PENDING"] },
+        "note": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderId", "recipientAccount", "amount", "currency", "type", "participants"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User account documents keyed by user ID"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Transactions collection where participants can read and senders can create"
+    }
+  }
+}
