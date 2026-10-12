@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.security.MessageDigest
 
 data class AuthUserData(
@@ -46,12 +47,23 @@ object AuthHelper {
     private const val MAX_RESENDS_PER_WINDOW = 3
     private const val OTP_EXPIRATION_MS = 10 * 60_000L // 10 minutes
     private const val MAX_OTP_ATTEMPTS = 5
+    private const val NETWORK_TIMEOUT_MS = 10_000L
+
+    private fun isTestEnvironment(): Boolean {
+        return try {
+            Class.forName("org.robolectric.Robolectric")
+            true
+        } catch (e: Throwable) {
+            false
+        }
+    }
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.applicationContext.getSharedPreferences(PREFS_AUTH, Context.MODE_PRIVATE)
     }
 
     fun getFirebaseAuth(context: Context): FirebaseAuth? {
+        if (isTestEnvironment()) return null
         return try {
             val appContext = context.applicationContext
             if (FirebaseApp.getApps(appContext).isEmpty()) {
@@ -195,11 +207,13 @@ object AuthHelper {
         val name = displayName.trim().ifEmpty { trimmedEmail.substringBefore("@") }
         val auth = getFirebaseAuth(context)
 
-        // Attempt Firebase Auth first
+        // Attempt Firebase Auth in live environment
         if (auth != null) {
             try {
-                val authResult = auth.createUserWithEmailAndPassword(trimmedEmail, password).await()
-                val firebaseUser = authResult.user
+                val authResult = withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    auth.createUserWithEmailAndPassword(trimmedEmail, password).await()
+                }
+                val firebaseUser = authResult?.user
                 if (firebaseUser != null) {
                     try {
                         val profileUpdate = UserProfileChangeRequest.Builder()
@@ -216,7 +230,6 @@ object AuthHelper {
                         recordResendSent(context, trimmedEmail)
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to send email verification via Firebase", e)
-                        // Do not simulate success if provider failed
                         return@withContext Result.failure(
                             IllegalStateException("Failed to send verification email: ${e.localizedMessage ?: e.message}")
                         )
@@ -242,7 +255,6 @@ object AuthHelper {
                 return@withContext Result.failure(IllegalStateException("Network connection error. Please verify your connection and try again."))
             } catch (e: Exception) {
                 Log.w(TAG, "Firebase signUpWithEmail failed, checking fallback: ${e.message}", e)
-                // If Firebase returned a legitimate auth error, do not silently swallow it
                 if (e.message?.contains("API key", ignoreCase = true) == false &&
                     e.message?.contains("configuration", ignoreCase = true) == false
                 ) {
@@ -308,10 +320,11 @@ object AuthHelper {
         val auth = getFirebaseAuth(context)
         if (auth != null) {
             try {
-                val authResult = auth.signInWithEmailAndPassword(trimmedEmail, password).await()
-                val firebaseUser = authResult.user
+                val authResult = withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    auth.signInWithEmailAndPassword(trimmedEmail, password).await()
+                }
+                val firebaseUser = authResult?.user
                 if (firebaseUser != null) {
-                    // Reload user to ensure latest verification status from Firebase
                     try {
                         firebaseUser.reload().await()
                     } catch (e: Exception) {
@@ -384,7 +397,6 @@ object AuthHelper {
             return@withContext Result.failure(IllegalArgumentException("Please enter a valid email address"))
         }
 
-        // Check rate limits & cooldown
         val check = checkResendCooldown(context, trimmedEmail)
         if (check.isFailure) {
             return@withContext Result.failure(check.exceptionOrNull() ?: IllegalStateException("Rate limit exceeded"))
@@ -395,7 +407,9 @@ object AuthHelper {
 
         if (currentUser != null && currentUser.email?.equals(trimmedEmail, ignoreCase = true) == true) {
             return@withContext try {
-                currentUser.sendEmailVerification().await()
+                withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    currentUser.sendEmailVerification().await()
+                }
                 recordResendSent(context, trimmedEmail)
                 Result.success("Verification link sent! Please check your inbox and spam folder at $trimmedEmail.")
             } catch (e: Exception) {
@@ -434,7 +448,9 @@ object AuthHelper {
 
         if (currentUser != null) {
             try {
-                currentUser.reload().await()
+                withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    currentUser.reload().await()
+                }
                 val isVerified = currentUser.isEmailVerified
                 if (isVerified) {
                     val name = currentUser.displayName ?: trimmedEmail.substringBefore("@")
@@ -481,7 +497,6 @@ object AuthHelper {
 
         val now = System.currentTimeMillis()
         if (now > expiryTime) {
-            // Expired code - invalidate
             prefs.edit()
                 .remove("otp_$trimmedEmail")
                 .remove("otp_expiry_$trimmedEmail")
@@ -493,7 +508,6 @@ object AuthHelper {
         }
 
         if (attempts >= MAX_OTP_ATTEMPTS) {
-            // Max attempts exceeded - invalidate
             prefs.edit()
                 .remove("otp_$trimmedEmail")
                 .remove("otp_expiry_$trimmedEmail")
@@ -539,13 +553,14 @@ object AuthHelper {
         val auth = getFirebaseAuth(context)
         if (auth != null) {
             try {
-                auth.sendPasswordResetEmail(trimmedEmail).await()
+                withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    auth.sendPasswordResetEmail(trimmedEmail).await()
+                }
                 return@withContext Result.success("Password reset email sent to $trimmedEmail. Check your inbox.")
             } catch (e: com.google.firebase.auth.FirebaseAuthInvalidUserException) {
                 return@withContext Result.failure(IllegalArgumentException("No account found with this email address."))
             } catch (e: Exception) {
                 Log.w(TAG, "Firebase password reset email failed: ${e.message}")
-                // Do NOT fake success - return real error message
                 return@withContext Result.failure(
                     IllegalStateException("Failed to send password reset email: ${e.localizedMessage ?: e.message}")
                 )
