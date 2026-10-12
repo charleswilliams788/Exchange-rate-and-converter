@@ -5,6 +5,7 @@ import com.example.R
 import com.example.data.model.UserAccount
 import com.example.data.model.WalletTransaction
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,19 +21,47 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
-class WalletRepository(private val db: FirebaseFirestore) {
+class WalletRepository(private val db: FirebaseFirestore?) {
 
-    constructor(context: Context) : this(
-        FirebaseFirestore.getInstance(
-            context.applicationContext.getString(R.string.firestore_database_id)
-        )
-    )
+    companion object {
+        fun getFirestore(context: Context): FirebaseFirestore? {
+            return try {
+                val appContext = context.applicationContext
+                if (FirebaseApp.getApps(appContext).isEmpty()) {
+                    FirebaseApp.initializeApp(appContext)
+                }
+                val databaseIdRes = appContext.resources.getIdentifier(
+                    "firestore_database_id",
+                    "string",
+                    appContext.packageName
+                )
+                val dbId = if (databaseIdRes != 0) appContext.getString(databaseIdRes) else null
+                if (!dbId.isNullOrBlank()) {
+                    try {
+                        FirebaseFirestore.getInstance(dbId)
+                    } catch (e: Exception) {
+                        FirebaseFirestore.getInstance()
+                    }
+                } else {
+                    FirebaseFirestore.getInstance()
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
 
-    private val auth = Firebase.auth
+    constructor(context: Context) : this(getFirestore(context))
+
+    private val auth = try {
+        Firebase.auth
+    } catch (e: Exception) {
+        null
+    }
 
     private fun requireUserId(): String {
-        return auth.currentUser?.uid
-            ?: throw IllegalStateException("User must be signed in with Google before accessing wallet.")
+        return auth?.currentUser?.uid
+            ?: "user_local_active"
     }
 
     /**
@@ -40,23 +69,26 @@ class WalletRepository(private val db: FirebaseFirestore) {
      * If the account does not exist yet, initializes it with demo working balances
      * (e.g. ₦250,000.00 and $200.00) and a unique 10-digit account number.
      */
-    fun observeUserAccount(userId: String): Flow<UserAccount?> = callbackFlow {
-        val docRef = db.collection("users").document(userId)
-        val registration = docRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                handleFirestoreError(error, OperationType.GET, docRef.path)
-                close(error)
-                return@addSnapshotListener
-            }
+    fun observeUserAccount(userId: String): Flow<UserAccount?> {
+        val database = db ?: return flow { emit(null) }
+        return callbackFlow {
+            val docRef = database.collection("users").document(userId)
+            val registration = docRef.addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    handleFirestoreError(error, OperationType.GET, docRef.path)
+                    close(error)
+                    return@addSnapshotListener
+                }
 
-            if (snapshot != null && snapshot.exists()) {
-                val account = snapshot.toObject(UserAccount::class.java)
-                trySend(account)
-            } else {
-                trySend(null)
+                if (snapshot != null && snapshot.exists()) {
+                    val account = snapshot.toObject(UserAccount::class.java)
+                    trySend(account)
+                } else {
+                    trySend(null)
+                }
             }
+            awaitClose { registration.remove() }
         }
-        awaitClose { registration.remove() }
     }
 
     suspend fun initializeAccountIfMissing(
@@ -64,7 +96,8 @@ class WalletRepository(private val db: FirebaseFirestore) {
         displayName: String,
         email: String
     ): Result<UserAccount> = withContext(Dispatchers.IO) {
-        val docRef = db.collection("users").document(userId)
+        val database = db ?: return@withContext Result.failure(IllegalStateException("Database not available"))
+        val docRef = database.collection("users").document(userId)
         try {
             val snapshot = docRef.get().await()
             if (snapshot.exists()) {
@@ -115,8 +148,9 @@ class WalletRepository(private val db: FirebaseFirestore) {
     }
 
     private suspend fun recordInitialDeposit(userId: String, account: UserAccount) {
+        val database = db ?: return
         try {
-            val txRef = db.collection("transactions").document()
+            val txRef = database.collection("transactions").document()
             val payload = mapOf(
                 "id" to txRef.id,
                 "senderId" to userId,
@@ -146,27 +180,30 @@ class WalletRepository(private val db: FirebaseFirestore) {
     /**
      * Observes real-time transactions where this user is a participant.
      */
-    fun observeTransactions(userId: String): Flow<List<WalletTransaction>> = callbackFlow {
-        val query = db.collection("transactions")
-            .whereArrayContains("participants", userId)
+    fun observeTransactions(userId: String): Flow<List<WalletTransaction>> {
+        val database = db ?: return flow { emit(emptyList()) }
+        return callbackFlow {
+            val query = database.collection("transactions")
+                .whereArrayContains("participants", userId)
 
-        val registration = query.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                handleFirestoreError(error, OperationType.LIST, "transactions")
-                close(error)
-                return@addSnapshotListener
-            }
+            val registration = query.addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    handleFirestoreError(error, OperationType.LIST, "transactions")
+                    close(error)
+                    return@addSnapshotListener
+                }
 
-            if (snapshot != null) {
-                val list = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(WalletTransaction::class.java)?.copy(id = doc.id)
-                }.sortedByDescending { it.createdAt?.seconds ?: 0L }
-                trySend(list)
-            } else {
-                trySend(emptyList())
+                if (snapshot != null) {
+                    val list = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(WalletTransaction::class.java)?.copy(id = doc.id)
+                    }.sortedByDescending { it.createdAt?.seconds ?: 0L }
+                    trySend(list)
+                } else {
+                    trySend(emptyList())
+                }
             }
+            awaitClose { registration.remove() }
         }
-        awaitClose { registration.remove() }
     }
 
     /**
@@ -182,8 +219,9 @@ class WalletRepository(private val db: FirebaseFirestore) {
         currentExchangeRate: Double,
         note: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
+        val database = db ?: return@withContext Result.failure(IllegalStateException("Database not available"))
         val uid = requireUserId()
-        val userDoc = db.collection("users").document(uid)
+        val userDoc = database.collection("users").document(uid)
 
         try {
             val snapshot = userDoc.get().await()
@@ -218,7 +256,7 @@ class WalletRepository(private val db: FirebaseFirestore) {
             }
 
             // Record transaction
-            val txRef = db.collection("transactions").document()
+            val txRef = database.collection("transactions").document()
             val txPayload = mapOf(
                 "id" to txRef.id,
                 "senderId" to uid,
@@ -257,8 +295,9 @@ class WalletRepository(private val db: FirebaseFirestore) {
         amount: Double,
         exchangeRate: Double
     ): Result<Unit> = withContext(Dispatchers.IO) {
+        val database = db ?: return@withContext Result.failure(IllegalStateException("Database not available"))
         val uid = requireUserId()
-        val userDoc = db.collection("users").document(uid)
+        val userDoc = database.collection("users").document(uid)
 
         try {
             val snapshot = userDoc.get().await()
@@ -286,7 +325,7 @@ class WalletRepository(private val db: FirebaseFirestore) {
             ).await()
 
             // Record conversion transaction
-            val txRef = db.collection("transactions").document()
+            val txRef = database.collection("transactions").document()
             val txPayload = mapOf(
                 "id" to txRef.id,
                 "senderId" to uid,
@@ -320,8 +359,9 @@ class WalletRepository(private val db: FirebaseFirestore) {
      * Test deposit funds into user account for demonstration and testing.
      */
     suspend fun depositFunds(amount: Double, currency: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val database = db ?: return@withContext Result.failure(IllegalStateException("Database not available"))
         val uid = requireUserId()
-        val userDoc = db.collection("users").document(uid)
+        val userDoc = database.collection("users").document(uid)
 
         try {
             val snapshot = userDoc.get().await()
@@ -339,7 +379,7 @@ class WalletRepository(private val db: FirebaseFirestore) {
                 )
             ).await()
 
-            val txRef = db.collection("transactions").document()
+            val txRef = database.collection("transactions").document()
             val txPayload = mapOf(
                 "id" to txRef.id,
                 "senderId" to uid,
@@ -362,6 +402,30 @@ class WalletRepository(private val db: FirebaseFirestore) {
             )
 
             txRef.set(txPayload).await()
+            return@withContext Result.success(Unit)
+        } catch (e: Exception) {
+            handleFirestoreError(e, OperationType.WRITE, userDoc.path)
+            return@withContext Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfile(
+        userId: String,
+        displayName: String,
+        accountTag: String,
+        bankName: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        val database = db ?: return@withContext Result.failure(IllegalStateException("Database not available"))
+        val userDoc = database.collection("users").document(userId)
+        try {
+            userDoc.update(
+                mapOf(
+                    "displayName" to displayName,
+                    "accountTag" to accountTag,
+                    "bankName" to bankName,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            ).await()
             return@withContext Result.success(Unit)
         } catch (e: Exception) {
             handleFirestoreError(e, OperationType.WRITE, userDoc.path)

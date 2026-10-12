@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.NotificationsActive
@@ -69,12 +70,14 @@ import com.example.auth.AuthHelper
 import com.example.data.model.ConversionDirection
 import com.example.ui.components.AccountOverviewCard
 import com.example.ui.components.AccountTransactionsList
+import com.example.ui.components.AuthScreenCard
 import com.example.ui.components.ConvertBalanceDialog
 import com.example.ui.components.CurrencyConverterCard
 import com.example.ui.components.CustomRateDialog
 import com.example.ui.components.DenominationCard
 import com.example.ui.components.GoogleSignInCard
 import com.example.ui.components.HistorySection
+import com.example.ui.components.ProfileDialog
 import com.example.ui.components.QuickPresetsRow
 import com.example.ui.components.QuickReferenceTable
 import com.example.ui.components.RateAlertDialog
@@ -108,6 +111,7 @@ fun MainScreen(
     var showSendMoneyDialog by remember { mutableStateOf(false) }
     var showReceiveMoneyDialog by remember { mutableStateOf(false) }
     var showConvertBalanceDialog by remember { mutableStateOf(false) }
+    var showProfileDialog by remember { mutableStateOf(false) }
 
     // Display status notifications
     LaunchedEffect(currencyUiState.statusNotification) {
@@ -220,26 +224,24 @@ fun MainScreen(
                         )
                     }
 
-                    // Sign Out / Switch account button if active
-                    if (walletUiState.userAccount != null) {
+                    // User Profile and Sign Out buttons if authenticated
+                    if (walletUiState.isAuthenticated) {
+                        IconButton(
+                            onClick = { showProfileDialog = true },
+                            modifier = Modifier.testTag("btn_top_profile")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = "User Profile",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
                         IconButton(
                             onClick = {
-                                if (walletUiState.currentUser != null) {
-                                    AuthHelper.signOut(
-                                        credentialManager = credentialManager,
-                                        onSignOutComplete = {
-                                            walletViewModel.clearAccount()
-                                            coroutineScope.launch {
-                                                snackbarHostState.showSnackbar("Signed out successfully")
-                                            }
-                                        },
-                                        scope = coroutineScope
-                                    )
-                                } else {
-                                    walletViewModel.clearAccount()
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Switched to sign in view")
-                                    }
+                                walletViewModel.signOut(credentialManager)
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Signed out successfully")
                                 }
                             },
                             modifier = Modifier.testTag("btn_sign_out")
@@ -425,29 +427,20 @@ fun MainScreen(
 
                         if (account == null) {
                             item {
-                                GoogleSignInCard(
+                                AuthScreenCard(
                                     isLoading = walletUiState.isAuthLoading,
-                                    onSignInClick = {
-                                        walletViewModel.setAuthLoading(true)
-                                        AuthHelper.signInWithGoogle(
-                                            context = context,
-                                            credentialManager = credentialManager,
-                                            onAuthSuccess = {
-                                                walletViewModel.setAuthLoading(false)
-                                            },
-                                            onAuthError = { err ->
-                                                walletViewModel.setAuthLoading(false)
-                                                coroutineScope.launch {
-                                                    snackbarHostState.showSnackbar("Sign in error: $err")
-                                                }
-                                            },
-                                            onAuthCancelled = {
-                                                walletViewModel.setAuthLoading(false)
-                                            },
-                                            scope = coroutineScope
-                                        )
+                                    errorMessage = walletUiState.authErrorMessage,
+                                    successMessage = walletUiState.authSuccessMessage,
+                                    onSignIn = { email, pass ->
+                                        walletViewModel.signIn(email, pass)
                                     },
-                                    onDemoClick = {
+                                    onSignUp = { email, pass, name ->
+                                        walletViewModel.signUp(email, pass, name)
+                                    },
+                                    onForgotPassword = { email ->
+                                        walletViewModel.sendPasswordReset(email)
+                                    },
+                                    onQuickDemoAccess = {
                                         walletViewModel.useDemoAccount()
                                     }
                                 )
@@ -464,7 +457,8 @@ fun MainScreen(
                                         // Quick add test funds
                                         walletViewModel.depositTestFunds(50000.0, "NGN")
                                     },
-                                    onCopyAccount = copyToClipboard
+                                    onCopyAccount = copyToClipboard,
+                                    onEditProfileClick = { showProfileDialog = true }
                                 )
                             }
 
@@ -563,6 +557,25 @@ fun MainScreen(
                 )
             },
             onDismiss = { showConvertBalanceDialog = false }
+        )
+    }
+
+    // Profile Dialog
+    if (showProfileDialog && walletUiState.userAccount != null) {
+        ProfileDialog(
+            account = walletUiState.userAccount!!,
+            onSaveProfile = { name, tag, bank ->
+                walletViewModel.updateProfile(name, tag, bank)
+            },
+            onSignOut = {
+                showProfileDialog = false
+                walletViewModel.signOut(credentialManager)
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Signed out successfully")
+                }
+            },
+            onCopyText = copyToClipboard,
+            onDismiss = { showProfileDialog = false }
         )
     }
 }

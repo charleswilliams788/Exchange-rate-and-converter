@@ -19,6 +19,14 @@ class MainActivity : ComponentActivity() {
         // Create the notification channel on launch
         NotificationHelper.createNotificationChannel(this)
 
+        try {
+            if (com.google.firebase.FirebaseApp.getApps(this).isEmpty()) {
+                com.google.firebase.FirebaseApp.initializeApp(this)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Firebase initialization: ${e.message}")
+        }
+
         setContent {
             MyApplicationTheme {
                 val currencyViewModel: CurrencyViewModel = viewModel()

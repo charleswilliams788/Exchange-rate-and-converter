@@ -30,6 +30,13 @@ class ExampleRobolectricTest {
     }
 
     @Test
+    fun `verify wallet viewmodel creation`() {
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val vm = com.example.ui.WalletViewModel(app)
+        org.junit.Assert.assertNotNull(vm)
+    }
+
+    @Test
     fun `verify target rate alert update`() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val prefs = RatePreferences(context)

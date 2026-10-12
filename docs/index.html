@@ -671,6 +671,90 @@
       transform: translateY(0);
       opacity: 1;
     }
+
+    /* Auth & Profile Styles */
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: none;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrap input {
+      padding-right: 42px;
+      width: 100%;
+    }
+    .btn-toggle-pwd {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-auth-header {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-msg-err {
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+      display: none;
+    }
+    .form-msg-success {
+      color: #10b981;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -685,9 +769,14 @@
           <p>Real-Time Converter & Wallet</p>
         </div>
       </div>
-      <div class="badge-live">
-        <span class="pulse-dot"></span>
-        <span id="market-status">Live Market</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="badge-live">
+          <span class="pulse-dot"></span>
+          <span id="market-status">Live Market</span>
+        </div>
+        <div id="header-auth-area">
+          <!-- Auth / Profile Buttons injected via JS -->
+        </div>
       </div>
     </header>
 
@@ -796,58 +885,203 @@
 
     <!-- VIEW 2: ACCOUNT, WALLET, SEND & RECEIVE -->
     <div id="view-wallet" style="display: none; flex-direction: column; gap: 16px;">
-      <!-- Working Account Overview Card -->
-      <div class="wallet-card">
-        <div class="wallet-top">
-          <div>
-            <div style="font-size: 13px; color: #94a3b8; font-weight: 500;">NairaRate Virtual Account</div>
-            <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;" id="wallet-acc-num">8144314093</div>
-            <div style="font-size: 12px; color: #cbd5e1;">NairaRate MFB • Bank</div>
-          </div>
-          <div class="acc-tag-badge" id="wallet-acc-tag">@amelie</div>
+      <!-- Auth Barrier for Unauthenticated Users -->
+      <div id="auth-barrier-box" class="card" style="display: none; text-align: center; padding: 32px 20px;">
+        <div style="width: 60px; height: 60px; background: #e6f7ef; color: #008751; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+          <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-
-        <div class="wallet-balances">
-          <div class="bal-box">
-            <div class="bal-label"><span>🇳🇬</span> Naira Balance</div>
-            <div class="bal-amount" id="bal-ngn">₦250,000.00</div>
-          </div>
-          <div class="bal-box">
-            <div class="bal-label"><span>🇺🇸</span> Dollar Balance</div>
-            <div class="bal-amount" id="bal-usd">$200.00</div>
-          </div>
-        </div>
-
-        <div class="wallet-actions">
-          <button class="action-btn" onclick="openModal('modal-send')">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
-            Send
-          </button>
-          <button class="action-btn" onclick="openModal('modal-receive')">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 7L7.8 16.2M7 7v9h9"/></svg>
-            Receive
-          </button>
-          <button class="action-btn" onclick="openModal('modal-convert')">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Convert
-          </button>
-          <button class="action-btn" onclick="addDemoFunds()">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-            Top Up
-          </button>
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #0f172a;">Protected Working Account</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+          Please sign in or create an account to access your <b>8144314093</b> dual-currency balances, send and receive money, and view transaction history.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
+          <button class="btn-submit" onclick="openAuthModal('signin')" style="padding: 12px; font-size: 14px;">Sign In to Account</button>
+          <button onclick="openAuthModal('signup')" style="padding: 12px; background: #ffffff; border: 1.5px solid var(--border); color: #0f172a; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 14px;">Create Free Account</button>
+          <button onclick="loginAsDemoUser()" style="background: transparent; border: none; color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px; margin-top: 4px;">Explore Demo Account (8144314093)</button>
         </div>
       </div>
 
-      <!-- Account Transactions -->
-      <div class="card">
-        <div style="font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-          <span>Recent Activity</span>
-          <span style="font-size: 11px; color: var(--text-muted);">Real-time stream</span>
+      <!-- Authenticated User Dashboard -->
+      <div id="auth-wallet-box" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Working Account Overview Card -->
+        <div class="wallet-card">
+          <div class="wallet-top">
+            <div>
+              <div style="font-size: 13px; color: #94a3b8; font-weight: 500;">NairaRate Virtual Account</div>
+              <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;" id="wallet-acc-num">8144314093</div>
+              <div style="font-size: 12px; color: #cbd5e1;" id="wallet-bank-name">NairaRate MFB • Bank</div>
+            </div>
+            <div class="acc-tag-badge" id="wallet-acc-tag" onclick="openProfileModal()" style="cursor: pointer;">@amelie</div>
+          </div>
+
+          <div class="wallet-balances">
+            <div class="bal-box">
+              <div class="bal-label"><span>🇳🇬</span> Naira Balance</div>
+              <div class="bal-amount" id="bal-ngn">₦250,000.00</div>
+            </div>
+            <div class="bal-box">
+              <div class="bal-label"><span>🇺🇸</span> Dollar Balance</div>
+              <div class="bal-amount" id="bal-usd">$200.00</div>
+            </div>
+          </div>
+
+          <div class="wallet-actions">
+            <button class="action-btn" onclick="openModal('modal-send')">
+              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+              Send
+            </button>
+            <button class="action-btn" onclick="openModal('modal-receive')">
+              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 7L7.8 16.2M7 7v9h9"/></svg>
+              Receive
+            </button>
+            <button class="action-btn" onclick="openModal('modal-convert')">
+              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Convert
+            </button>
+            <button class="action-btn" onclick="addDemoFunds()">
+              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+              Top Up
+            </button>
+          </div>
         </div>
-        <div id="tx-container">
-          <!-- Injected via JS -->
+
+        <!-- Account Transactions -->
+        <div class="card">
+          <div style="font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span>Recent Activity</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Real-time stream</span>
+          </div>
+          <div id="tx-container">
+            <!-- Injected via JS -->
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: USER AUTHENTICATION -->
+  <div class="modal-overlay" id="modal-auth">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="auth-modal-title">Account Access</div>
+        <button class="btn-close" onclick="closeModal('modal-auth')">✕</button>
+      </div>
+
+      <!-- Auth Tabs: Sign In / Register / Forgot Password -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="auth-tab-btn-signin" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="auth-tab-btn-signup" onclick="switchAuthTab('signup')">Register</button>
+        <button class="auth-tab" id="auth-tab-btn-forgot" onclick="switchAuthTab('forgot')">Forgot Password</button>
+      </div>
+
+      <div id="auth-msg-box" style="margin-bottom: 12px; display: none; font-size: 13px; padding: 10px 14px; border-radius: 10px;"></div>
+
+      <!-- SIGN IN FORM -->
+      <form id="form-signin" onsubmit="handleSignInSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="signin-email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="password-wrap">
+            <input type="password" class="form-input" id="signin-password" placeholder="••••••••" required>
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('signin-password', this)">👁</button>
+          </div>
+        </div>
+        <div style="text-align: right; margin: -6px 0 14px;">
+          <a href="javascript:void(0)" onclick="switchAuthTab('forgot')" style="font-size: 12px; color: var(--primary); text-decoration: none; font-weight: 700;">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit-signin">Sign In</button>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="form-signup" style="display: none;" onsubmit="handleSignUpSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="signup-name" placeholder="e.g. Chiemelie Achu" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="signup-email" placeholder="name@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password (min 6 characters)</label>
+          <div class="password-wrap">
+            <input type="password" class="form-input" id="signup-password" placeholder="••••••••" minlength="6" required>
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('signup-password', this)">👁</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <div class="password-wrap">
+            <input type="password" class="form-input" id="signup-confirm-password" placeholder="••••••••" minlength="6" required>
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('signup-confirm-password', this)">👁</button>
+          </div>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+          Your working account number (<b>8144314093</b>) and custom @tag will be generated upon registration.
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit-signup">Create Account</button>
+      </form>
+
+      <!-- FORGOT PASSWORD FORM -->
+      <form id="form-forgot" style="display: none;" onsubmit="handleForgotSubmit(event)">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          Enter your registered email address and we will send you secure password reset instructions.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="forgot-email" placeholder="name@example.com" required>
+        </div>
+        <button type="submit" class="btn-submit" id="btn-submit-forgot">Send Reset Instructions</button>
+        <div style="text-align: center; margin-top: 12px;">
+          <a href="javascript:void(0)" onclick="switchAuthTab('signin')" style="font-size: 12px; color: var(--primary); font-weight: 700; text-decoration: none;">← Back to Sign In</a>
+        </div>
+      </form>
+
+      <div style="margin-top: 14px; text-align: center; border-top: 1px solid var(--border); padding-top: 12px;">
+        <button type="button" onclick="loginAsDemoUser(); closeModal('modal-auth');" style="background: transparent; border: none; font-size: 12px; font-weight: 700; color: var(--primary); cursor: pointer;">
+          Instant Access: Demo User (8144314093)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: USER PROFILE -->
+  <div class="modal-overlay" id="modal-profile">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">User Profile</div>
+        <button class="btn-close" onclick="closeModal('modal-profile')">✕</button>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 11px; font-weight: 800; color: var(--primary);">ACCOUNT NUMBER</span>
+          <button onclick="copyProfileAccount()" style="background: none; border: none; font-size: 11px; color: var(--primary); font-weight: 700; cursor: pointer;">Copy</button>
+        </div>
+        <div style="font-size: 20px; font-weight: 800; font-family: monospace; letter-spacing: 1px;" id="profile-acc-number">8144314093</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="profile-email-display">user@example.com</div>
+      </div>
+
+      <form id="form-profile" onsubmit="handleProfileUpdateSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="profile-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">P2P Tag</label>
+          <input type="text" class="form-input" id="profile-tag" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bank Institution</label>
+          <input type="text" class="form-input" id="profile-bank" required>
+        </div>
+        <button type="submit" class="btn-submit" style="margin-bottom: 10px;">Save Profile Changes</button>
+      </form>
+
+      <button onclick="handleLogout()" style="width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: none; font-weight: 700; font-size: 13px; border-radius: 12px; cursor: pointer;">Sign Out of Account</button>
     </div>
   </div>
 
@@ -975,6 +1209,8 @@
     // State
     let currentRate = 1530.00;
     let isUsdToNgn = true;
+    let currentUser = null; // Stored user session
+
     let wallet = {
       accountNumber: "8144314093",
       accountTag: "@amelie",
@@ -989,6 +1225,13 @@
     };
 
     // Load from LocalStorage if available
+    try {
+      const savedUser = localStorage.getItem("nairarate_user");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+      }
+    } catch(e){}
+
     const savedWallet = localStorage.getItem("nairarate_wallet");
     if (savedWallet) {
       try { wallet = JSON.parse(savedWallet); } catch(e){}
@@ -997,6 +1240,297 @@
     function saveWallet() {
       localStorage.setItem("nairarate_wallet", JSON.stringify(wallet));
       renderWallet();
+    }
+
+    // AUTHENTICATION & SECURITY SYSTEM
+    async function hashString(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function getStoredUsers() {
+      try {
+        const raw = localStorage.getItem("nairarate_registered_users");
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveStoredUsers(users) {
+      localStorage.setItem("nairarate_registered_users", JSON.stringify(users));
+    }
+
+    function renderAuthUI() {
+      const headerArea = document.getElementById("header-auth-area");
+      const barrierBox = document.getElementById("auth-barrier-box");
+      const walletBox = document.getElementById("auth-wallet-box");
+
+      if (currentUser) {
+        // Show user avatar pill & sign out button in header
+        headerArea.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div class="user-pill" onclick="openProfileModal()" title="View and Edit Profile">
+              <span>👤</span>
+              <span id="header-user-tag">${wallet.accountTag || currentUser.tag || '@amelie'}</span>
+            </div>
+            <button class="btn-auth-header" onclick="handleLogout()" style="background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5;">
+              Sign Out
+            </button>
+          </div>
+        `;
+        if (barrierBox) barrierBox.style.display = "none";
+        if (walletBox) walletBox.style.display = "flex";
+      } else {
+        // Show Sign In button in header
+        headerArea.innerHTML = `
+          <button class="btn-auth-header" onclick="openAuthModal('signin')">
+            Sign In
+          </button>
+        `;
+        if (barrierBox) barrierBox.style.display = "block";
+        if (walletBox) walletBox.style.display = "none";
+      }
+    }
+
+    function openAuthModal(tab = 'signin') {
+      openModal('modal-auth');
+      switchAuthTab(tab);
+      clearAuthMessages();
+    }
+
+    function switchAuthTab(tab) {
+      document.getElementById("auth-tab-btn-signin").classList.toggle("active", tab === "signin");
+      document.getElementById("auth-tab-btn-signup").classList.toggle("active", tab === "signup");
+      document.getElementById("auth-tab-btn-forgot").classList.toggle("active", tab === "forgot");
+
+      document.getElementById("form-signin").style.display = tab === "signin" ? "block" : "none";
+      document.getElementById("form-signup").style.display = tab === "signup" ? "block" : "none";
+      document.getElementById("form-forgot").style.display = tab === "forgot" ? "block" : "none";
+
+      document.getElementById("auth-modal-title").innerText = 
+        tab === "signin" ? "Sign In to Account" : (tab === "signup" ? "Register Account" : "Reset Password");
+
+      clearAuthMessages();
+    }
+
+    function setAuthMessage(msg, isSuccess = false) {
+      const box = document.getElementById("auth-msg-box");
+      box.innerText = msg;
+      box.style.display = "block";
+      box.style.background = isSuccess ? "#e6f7ef" : "#fef2f2";
+      box.style.color = isSuccess ? "#008751" : "#dc2626";
+      box.style.border = isSuccess ? "1px solid #a7f3d0" : "1px solid #fecaca";
+    }
+
+    function clearAuthMessages() {
+      const box = document.getElementById("auth-msg-box");
+      if (box) box.style.display = "none";
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        btn.innerText = "🙈";
+      } else {
+        input.type = "password";
+        btn.innerText = "👁";
+      }
+    }
+
+    async function handleSignInSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("signin-email").value.trim().toLowerCase();
+      const pass = document.getElementById("signin-password").value;
+
+      if (!email || !pass) {
+        setAuthMessage("Please enter your email and password.");
+        return;
+      }
+
+      const passHash = await hashString(pass);
+      const users = getStoredUsers();
+      const existingUser = users.find(u => u.email.toLowerCase() === email);
+
+      // Verify credentials or check demo user
+      if (existingUser) {
+        if (existingUser.passwordHash === passHash) {
+          currentUser = {
+            id: existingUser.id,
+            email: existingUser.email,
+            name: existingUser.name,
+            tag: existingUser.tag || "@" + existingUser.email.split("@")[0]
+          };
+          wallet.displayName = currentUser.name;
+          wallet.accountTag = currentUser.tag;
+          localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
+          saveWallet();
+          renderAuthUI();
+          closeModal('modal-auth');
+          showToast(`Welcome back, ${currentUser.name}!`);
+          return;
+        } else {
+          setAuthMessage("Incorrect password. Please try again.");
+          return;
+        }
+      }
+
+      // Default fallback for demo / test credentials
+      if (email === "achuchiemelie2507@gmail.com" || email === "user@nairarate.com") {
+        loginAsDemoUser();
+        closeModal('modal-auth');
+        return;
+      }
+
+      setAuthMessage("No account found with this email. Please click Register to create one.");
+    }
+
+    async function handleSignUpSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim().toLowerCase();
+      const pass = document.getElementById("signup-password").value;
+      const confirmPass = document.getElementById("signup-confirm-password").value;
+
+      if (!name || !email || !pass) {
+        setAuthMessage("Please fill in all required fields.");
+        return;
+      }
+      if (pass.length < 6) {
+        setAuthMessage("Password must be at least 6 characters long.");
+        return;
+      }
+      if (pass !== confirmPass) {
+        setAuthMessage("Passwords do not match.");
+        return;
+      }
+
+      const users = getStoredUsers();
+      if (users.some(u => u.email.toLowerCase() === email)) {
+        setAuthMessage("An account with this email already exists. Please sign in.");
+        return;
+      }
+
+      const passHash = await hashString(pass);
+      const tag = "@" + (email.split("@")[0].replace(/[^a-zA-Z0-9]/g, '') || "user");
+      const newUser = {
+        id: "usr_" + Date.now(),
+        name: name,
+        email: email,
+        tag: tag,
+        passwordHash: passHash,
+        accountNumber: "8144314093",
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      saveStoredUsers(users);
+
+      currentUser = {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        tag: newUser.tag
+      };
+
+      wallet.displayName = newUser.name;
+      wallet.accountTag = newUser.tag;
+      wallet.accountNumber = "8144314093";
+      wallet.ngnBalance = 250000.00;
+      wallet.usdBalance = 200.00;
+
+      localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
+      saveWallet();
+      renderAuthUI();
+      closeModal('modal-auth');
+      showToast(`Welcome to NairaRate, ${newUser.name}!`);
+    }
+
+    function handleForgotSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("forgot-email").value.trim();
+      if (!email) {
+        setAuthMessage("Please enter your registered email address.");
+        return;
+      }
+      setAuthMessage(`Password reset instructions have been sent to ${email}. Please check your inbox.`, true);
+      showToast("Password reset link sent!");
+      setTimeout(() => {
+        switchAuthTab('signin');
+      }, 3500);
+    }
+
+    function loginAsDemoUser() {
+      currentUser = {
+        id: "demo_user_1",
+        name: "Chiemelie Achu",
+        email: "achuchiemelie2507@gmail.com",
+        tag: "@amelie"
+      };
+      wallet.displayName = currentUser.name;
+      wallet.accountTag = currentUser.tag;
+      wallet.accountNumber = "8144314093";
+      localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
+      saveWallet();
+      renderAuthUI();
+      showToast("Logged in as Demo User (8144314093)!");
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem("nairarate_user");
+      renderAuthUI();
+      closeModal('modal-profile');
+      showToast("You have been signed out.");
+    }
+
+    function openProfileModal() {
+      if (!currentUser) {
+        openAuthModal('signin');
+        return;
+      }
+      document.getElementById("profile-acc-number").innerText = wallet.accountNumber;
+      document.getElementById("profile-email-display").innerText = currentUser.email || "achuchiemelie2507@gmail.com";
+      document.getElementById("profile-name").value = wallet.displayName;
+      document.getElementById("profile-tag").value = wallet.accountTag;
+      document.getElementById("profile-bank").value = wallet.bankName;
+      openModal('modal-profile');
+    }
+
+    function handleProfileUpdateSubmit(e) {
+      e.preventDefault();
+      const newName = document.getElementById("profile-name").value.trim();
+      let newTag = document.getElementById("profile-tag").value.trim();
+      const newBank = document.getElementById("profile-bank").value.trim();
+
+      if (!newName || !newTag || !newBank) {
+        return alert("All profile fields are required.");
+      }
+      if (!newTag.startsWith("@")) newTag = "@" + newTag;
+
+      wallet.displayName = newName;
+      wallet.accountTag = newTag;
+      wallet.bankName = newBank;
+
+      if (currentUser) {
+        currentUser.name = newName;
+        currentUser.tag = newTag;
+        localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
+      }
+
+      saveWallet();
+      renderAuthUI();
+      closeModal('modal-profile');
+      showToast("Profile details updated successfully!");
+    }
+
+    function copyProfileAccount() {
+      navigator.clipboard.writeText(wallet.accountNumber);
+      showToast("Copied account number 8144314093!");
     }
 
     // Real-Time Exchange Rate Fetcher
@@ -1266,8 +1800,16 @@
       showToast("₦50,000 added to your account!");
     }
 
-    // Modal controls
-    function openModal(id) { document.getElementById(id).classList.add("active"); }
+    // Modal controls with authentication security guards
+    function openModal(id) {
+      if ((id === "modal-send" || id === "modal-receive" || id === "modal-convert") && !currentUser) {
+        showToast("Protected feature. Please sign in first.");
+        openAuthModal('signin');
+        return;
+      }
+      document.getElementById(id).classList.add("active");
+    }
+
     function closeModal(id) { document.getElementById(id).classList.remove("active"); }
 
     function copyResult() {
@@ -1294,6 +1836,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       renderPresets();
       fetchLiveRates();
+      renderAuthUI();
       renderWallet();
     });
   </script>

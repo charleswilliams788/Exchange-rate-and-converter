@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CallReceived
 import androidx.compose.material.icons.filled.CallMade
@@ -60,6 +61,7 @@ fun AccountOverviewCard(
     onConvertClick: () -> Unit,
     onAddFundsClick: () -> Unit,
     onCopyAccount: (String) -> Unit,
+    onEditProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var hideBalance by remember { mutableStateOf(false) }
@@ -152,17 +154,36 @@ fun AccountOverviewCard(
                     }
                 }
 
-                // Balance Visibility Toggle
-                IconButton(
-                    onClick = { hideBalance = !hideBalance },
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = if (hideBalance) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = "Toggle Balance",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Profile Dialog Trigger
+                    IconButton(
+                        onClick = onEditProfileClick,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .testTag("btn_dashboard_profile")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Edit Profile",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+
+                    // Balance Visibility Toggle
+                    IconButton(
+                        onClick = { hideBalance = !hideBalance },
+                        modifier = Modifier
+                            .size(36.dp)
+                            .testTag("btn_toggle_balance")
+                    ) {
+                        Icon(
+                            imageVector = if (hideBalance) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = "Toggle Balance",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
 
