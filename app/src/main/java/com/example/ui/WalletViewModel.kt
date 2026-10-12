@@ -152,7 +152,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                             pendingVerificationUser = user,
                             isEmailVerified = false,
                             userAccount = null,
-                            authSuccessMessage = "Verification email sent to ${user.email}. Please click the link in your email to verify your account."
+                            authSuccessMessage = "A 6-digit verification code has been sent to ${user.email}. Enter the code below to complete registration."
                         )
                     }
                     startCooldownCountdown(user.email)

@@ -24,7 +24,9 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MarkEmailRead
+import androidx.compose.material.icons.filled.Pin
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -47,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,7 +73,6 @@ fun EmailVerificationCard(
     modifier: Modifier = Modifier
 ) {
     var otpInput by remember { mutableStateOf("") }
-    var showOtpField by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Card(
@@ -103,36 +106,36 @@ fun EmailVerificationCard(
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(50.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Default.MarkEmailRead,
                             contentDescription = "Email Verification",
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Verify Your Email",
+                        text = "Enter 6-Digit Code",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Action required to access wallet features",
+                        text = "We sent a verification code to your email",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Email Chip
+            // Email Display Chip
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
@@ -160,10 +163,10 @@ fun EmailVerificationCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Informative Explanation about Verification Delivery
+            // Informational Banner
             Surface(
                 shape = RoundedCornerShape(14.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -175,31 +178,22 @@ fun EmailVerificationCard(
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .size(20.dp)
+                            .size(18.dp)
                             .padding(top = 2.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Column {
-                        Text(
-                            text = "A verification link has been sent to your email inbox.",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Please open the email from Firebase Authentication and click the link. Once clicked, return here and tap 'Check Verification Status'.",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = "Please check your inbox (and spam folder) for the 6-digit code. Enter the code below to complete registration and unlock your wallet.",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Error Message
+            // Error Banner
             if (!errorMessage.isNullOrBlank()) {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
@@ -218,7 +212,7 @@ fun EmailVerificationCard(
                 }
             }
 
-            // Success Message
+            // Success Banner
             if (!successMessage.isNullOrBlank()) {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
@@ -238,10 +232,91 @@ fun EmailVerificationCard(
                 }
             }
 
-            // Primary Action: Check Verification Status
+            // Prominent 6-Digit Code Input Field
+            Text(
+                text = "Verification Code (6 Digits)",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = otpInput,
+                onValueChange = { input ->
+                    if (input.length <= 6 && input.all { it.isDigit() }) {
+                        otpInput = input
+                    }
+                },
+                placeholder = {
+                    Text(
+                        text = "• • • • • •",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            letterSpacing = 8.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 8.sp,
+                    fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(14.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.NumberPassword,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        if (otpInput.length == 6) {
+                            onVerifyOtp(otpInput)
+                        }
+                    }
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("input_otp_code")
+            )
+
+            // Expiration note
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp, bottom = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Timer,
+                    contentDescription = null,
+                    modifier = Modifier.size(13.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Code expires in 10 minutes (max 5 attempts)",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // PRIMARY ACTION: Verify Code Button
             Button(
-                onClick = onCheckStatus,
-                enabled = !isLoading,
+                onClick = {
+                    focusManager.clearFocus()
+                    onVerifyOtp(otpInput)
+                },
+                enabled = !isLoading && otpInput.length == 6,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -250,7 +325,7 @@ fun EmailVerificationCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .testTag("btn_check_verification_status")
+                    .testTag("btn_submit_otp_code")
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
@@ -260,13 +335,13 @@ fun EmailVerificationCard(
                     )
                 } else {
                     Icon(
-                        imageVector = Icons.Default.Refresh,
+                        imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Check Verification Status",
+                        text = "Verify Code",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -275,7 +350,7 @@ fun EmailVerificationCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Secondary Action: Resend Verification Email with Cooldown
+            // SECONDARY ACTION: Resend 6-Digit Code with Cooldown
             OutlinedButton(
                 onClick = onResendEmail,
                 enabled = !isLoading && cooldownSeconds <= 0,
@@ -293,90 +368,43 @@ fun EmailVerificationCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = if (cooldownSeconds > 0) {
-                        "Resend Email (wait ${cooldownSeconds}s)"
+                        "Resend Code (wait ${cooldownSeconds}s)"
                     } else {
-                        "Resend Verification Email"
+                        "Resend 6-Digit Code"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Optional 6-digit OTP Toggle
+            // Alternate check if clicked email link
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 TextButton(
-                    onClick = { showOtpField = !showOtpField },
-                    modifier = Modifier.testTag("btn_toggle_otp_input")
+                    onClick = onCheckStatus,
+                    enabled = !isLoading,
+                    modifier = Modifier.testTag("btn_check_verification_status")
                 ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (showOtpField) "Hide 6-digit code entry" else "Have a 6-digit verification code?",
+                        text = "Clicked a link in your email? Check Status",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
 
-            AnimatedVisibility(visible = showOtpField) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 8.dp)
-                ) {
-                    Text(
-                        text = "Enter the 6-digit verification code sent to your email or generated by the authenticator:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = otpInput,
-                            onValueChange = { if (it.length <= 6 && it.all { char -> char.isDigit() }) otpInput = it },
-                            placeholder = { Text("123456") },
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                    if (otpInput.length == 6) onVerifyOtp(otpInput)
-                                }
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("input_otp_code")
-                        )
-
-                        Button(
-                            onClick = {
-                                focusManager.clearFocus()
-                                onVerifyOtp(otpInput)
-                            },
-                            enabled = !isLoading && otpInput.length == 6,
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .height(56.dp)
-                                .testTag("btn_submit_otp_code")
-                        ) {
-                            Text("Verify Code", fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             // Sign out / Back to sign-in option
             Row(

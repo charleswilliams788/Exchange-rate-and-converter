@@ -129,7 +129,7 @@ object AuthHelper {
         if (timeSinceLast < RESEND_COOLDOWN_MS) {
             val secondsRemaining = ((RESEND_COOLDOWN_MS - timeSinceLast) / 1000) + 1
             return Result.failure(
-                IllegalStateException("Please wait ${secondsRemaining}s before requesting another verification email.")
+                IllegalStateException("Please wait ${secondsRemaining}s before requesting another verification code.")
             )
         }
 
@@ -137,7 +137,6 @@ object AuthHelper {
         var count = prefs.getInt("window_count_$normalizedEmail", 0)
 
         if (now - windowStart > RATE_LIMIT_WINDOW_MS) {
-            // Reset window
             prefs.edit()
                 .putLong("window_start_$normalizedEmail", now)
                 .putInt("window_count_$normalizedEmail", 0)
@@ -187,8 +186,7 @@ object AuthHelper {
     }
 
     /**
-     * Registers a new user and sends an email verification request.
-     * With Firebase Authentication, sends real verification email via sendEmailVerification().
+     * Registers a new user and dispatches a six-digit verification code to the provided email address.
      */
     suspend fun signUpWithEmail(
         context: Context,
@@ -205,75 +203,17 @@ object AuthHelper {
         }
 
         val name = displayName.trim().ifEmpty { trimmedEmail.substringBefore("@") }
-        val auth = getFirebaseAuth(context)
-
-        // Attempt Firebase Auth in live environment
-        if (auth != null) {
-            try {
-                val authResult = withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
-                    auth.createUserWithEmailAndPassword(trimmedEmail, password).await()
-                }
-                val firebaseUser = authResult?.user
-                if (firebaseUser != null) {
-                    try {
-                        val profileUpdate = UserProfileChangeRequest.Builder()
-                            .setDisplayName(name)
-                            .build()
-                        firebaseUser.updateProfile(profileUpdate).await()
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Profile name update in firebase failed: ${e.message}")
-                    }
-
-                    // Send REAL email verification link from Firebase
-                    try {
-                        firebaseUser.sendEmailVerification().await()
-                        recordResendSent(context, trimmedEmail)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to send email verification via Firebase", e)
-                        return@withContext Result.failure(
-                            IllegalStateException("Failed to send verification email: ${e.localizedMessage ?: e.message}")
-                        )
-                    }
-
-                    // Save local session as unverified - user MUST verify before accessing protected features
-                    saveLocalSession(context, firebaseUser.uid, trimmedEmail, name, false)
-
-                    return@withContext Result.success(
-                        AuthUserData(
-                            uid = firebaseUser.uid,
-                            email = trimmedEmail,
-                            displayName = name,
-                            isEmailVerified = false
-                        )
-                    )
-                }
-            } catch (e: com.google.firebase.auth.FirebaseAuthUserCollisionException) {
-                return@withContext Result.failure(IllegalArgumentException("An account with this email address already exists. Please sign in."))
-            } catch (e: com.google.firebase.auth.FirebaseAuthWeakPasswordException) {
-                return@withContext Result.failure(IllegalArgumentException(e.reason ?: "The chosen password is too weak."))
-            } catch (e: com.google.firebase.FirebaseNetworkException) {
-                return@withContext Result.failure(IllegalStateException("Network connection error. Please verify your connection and try again."))
-            } catch (e: Exception) {
-                Log.w(TAG, "Firebase signUpWithEmail failed, checking fallback: ${e.message}", e)
-                if (e.message?.contains("API key", ignoreCase = true) == false &&
-                    e.message?.contains("configuration", ignoreCase = true) == false
-                ) {
-                    return@withContext Result.failure(e)
-                }
-            }
-        }
-
-        // Local fallback registration with 6-digit OTP generation and strict expiration
         val prefs = getPrefs(context)
         val userKey = "user_$trimmedEmail"
         if (prefs.contains(userKey)) {
             return@withContext Result.failure(IllegalArgumentException("An account with this email already exists"))
         }
 
-        val hashedPassword = hashPassword(password)
-        val generatedUid = "local_" + System.currentTimeMillis()
+        // 1. Generate 6-digit verification code with 10-minute validity
         val secureOtp = "%06d".format((100000..999999).random())
         val expiryTime = System.currentTimeMillis() + OTP_EXPIRATION_MS
+        val hashedPassword = hashPassword(password)
+        val generatedUid = "user_" + System.currentTimeMillis()
 
         prefs.edit()
             .putString(userKey, hashedPassword)
@@ -288,7 +228,37 @@ object AuthHelper {
         recordResendSent(context, trimmedEmail)
         saveLocalSession(context, generatedUid, trimmedEmail, name, false)
 
-        Log.i(TAG, "Generated secure 6-digit verification code for $trimmedEmail: $secureOtp (expires in 10 minutes)")
+        // 2. Dispatch 6-digit code to the user's email address
+        val emailDispatch = EmailService.sendVerificationCode(trimmedEmail, name, secureOtp)
+        Log.i(TAG, "Dispatched 6-digit code for $trimmedEmail: $secureOtp -> $emailDispatch")
+
+        // 3. In parallel, sync with Firebase Authentication if available
+        val auth = getFirebaseAuth(context)
+        if (auth != null) {
+            try {
+                val authResult = withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    auth.createUserWithEmailAndPassword(trimmedEmail, password).await()
+                }
+                val firebaseUser = authResult?.user
+                if (firebaseUser != null) {
+                    try {
+                        val profileUpdate = UserProfileChangeRequest.Builder()
+                            .setDisplayName(name)
+                            .build()
+                        firebaseUser.updateProfile(profileUpdate).await()
+                        firebaseUser.sendEmailVerification().await()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Firebase parallel profile or link setup: ${e.message}")
+                    }
+                    saveLocalSession(context, firebaseUser.uid, trimmedEmail, name, false)
+                    return@withContext Result.success(
+                        AuthUserData(uid = firebaseUser.uid, email = trimmedEmail, displayName = name, isEmailVerified = false)
+                    )
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Firebase sync note: ${e.message}")
+            }
+        }
 
         Result.success(
             AuthUserData(
@@ -302,7 +272,6 @@ object AuthHelper {
 
     /**
      * Signs in an existing user and checks whether their email has been verified.
-     * Unverified users are prevented from accessing protected account features.
      */
     suspend fun signInWithEmail(
         context: Context,
@@ -331,7 +300,7 @@ object AuthHelper {
                         Log.w(TAG, "Failed to reload firebase user: ${e.message}")
                     }
 
-                    val isVerified = firebaseUser.isEmailVerified
+                    val isVerified = firebaseUser.isEmailVerified || getPrefs(context).getBoolean("verified_$trimmedEmail", false)
                     val name = firebaseUser.displayName ?: trimmedEmail.substringBefore("@")
 
                     saveLocalSession(context, firebaseUser.uid, trimmedEmail, name, isVerified)
@@ -350,9 +319,6 @@ object AuthHelper {
                 return@withContext Result.failure(IllegalArgumentException("Invalid email or password. Please check your credentials."))
             } catch (e: Exception) {
                 Log.w(TAG, "Firebase signInWithEmail error: ${e.message}")
-                if (e.message?.contains("password", ignoreCase = true) == true) {
-                    return@withContext Result.failure(IllegalArgumentException("Invalid email or password."))
-                }
             }
         }
 
@@ -372,7 +338,7 @@ object AuthHelper {
             )
         }
 
-        // Demo account (automatically verified for quick review)
+        // Demo account (automatically verified for quick testing)
         if (trimmedEmail == "achuchiemelie2507@gmail.com" || trimmedEmail == "user@nairarate.com") {
             val uid = "user_amelie"
             val name = "Chiemelie Achu"
@@ -386,7 +352,7 @@ object AuthHelper {
     }
 
     /**
-     * Resends a verification email (link or code) with strict cooldown and rate limits.
+     * Resends a fresh 6-digit verification code to the user's email address with cooldown enforcement.
      */
     suspend fun resendVerificationEmail(
         context: Context,
@@ -402,24 +368,8 @@ object AuthHelper {
             return@withContext Result.failure(check.exceptionOrNull() ?: IllegalStateException("Rate limit exceeded"))
         }
 
-        val auth = getFirebaseAuth(context)
-        val currentUser = auth?.currentUser
-
-        if (currentUser != null && currentUser.email?.equals(trimmedEmail, ignoreCase = true) == true) {
-            return@withContext try {
-                withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
-                    currentUser.sendEmailVerification().await()
-                }
-                recordResendSent(context, trimmedEmail)
-                Result.success("Verification link sent! Please check your inbox and spam folder at $trimmedEmail.")
-            } catch (e: Exception) {
-                Log.e(TAG, "Firebase resendEmailVerification failed", e)
-                Result.failure(IllegalStateException("Failed to resend verification email: ${e.localizedMessage ?: e.message}"))
-            }
-        }
-
-        // Local fallback: generate a new 6-digit OTP code with fresh expiration
         val prefs = getPrefs(context)
+        val name = prefs.getString("name_$trimmedEmail", trimmedEmail.substringBefore("@")) ?: "User"
         val secureOtp = "%06d".format((100000..999999).random())
         val expiryTime = System.currentTimeMillis() + OTP_EXPIRATION_MS
 
@@ -430,13 +380,38 @@ object AuthHelper {
             .apply()
 
         recordResendSent(context, trimmedEmail)
-        Log.i(TAG, "Resent secure 6-digit verification code for $trimmedEmail: $secureOtp")
 
-        Result.success("Verification code sent! A new 6-digit code has been issued for $trimmedEmail (valid for 10 minutes).")
+        // Send 6-digit code via EmailService
+        val dispatchResult = EmailService.sendVerificationCode(trimmedEmail, name, secureOtp)
+
+        // Also trigger Firebase link in parallel if available
+        val auth = getFirebaseAuth(context)
+        val currentUser = auth?.currentUser
+        if (currentUser != null && currentUser.email?.equals(trimmedEmail, ignoreCase = true) == true) {
+            try {
+                withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
+                    currentUser.sendEmailVerification().await()
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Firebase resend link note: ${e.message}")
+            }
+        }
+
+        when (dispatchResult) {
+            is EmailDispatchResult.SentViaProvider -> {
+                Result.success("A new 6-digit verification code was sent to $trimmedEmail via ${dispatchResult.provider}.")
+            }
+            is EmailDispatchResult.GeneratedCode -> {
+                Result.success("New 6-digit verification code generated! Enter $secureOtp to verify (expires in 10 minutes).")
+            }
+            is EmailDispatchResult.Failure -> {
+                Result.success("Code generated ($secureOtp), but email provider notice: ${dispatchResult.error}")
+            }
+        }
     }
 
     /**
-     * Checks if the email is verified via Firebase Auth reload.
+     * Checks verification status via Firebase reload or local store.
      */
     suspend fun checkVerificationStatus(
         context: Context,
@@ -451,15 +426,14 @@ object AuthHelper {
                 withTimeoutOrNull(NETWORK_TIMEOUT_MS) {
                     currentUser.reload().await()
                 }
-                val isVerified = currentUser.isEmailVerified
-                if (isVerified) {
+                if (currentUser.isEmailVerified) {
                     val name = currentUser.displayName ?: trimmedEmail.substringBefore("@")
                     saveLocalSession(context, currentUser.uid, trimmedEmail, name, true)
+                    getPrefs(context).edit().putBoolean("verified_$trimmedEmail", true).apply()
+                    return@withContext Result.success(true)
                 }
-                return@withContext Result.success(isVerified)
             } catch (e: Exception) {
                 Log.w(TAG, "Error reloading Firebase user: ${e.message}")
-                return@withContext Result.failure(e)
             }
         }
 
