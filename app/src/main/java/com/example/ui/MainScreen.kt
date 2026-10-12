@@ -72,6 +72,7 @@ import com.example.ui.components.AccountOverviewCard
 import com.example.ui.components.AccountTransactionsList
 import com.example.ui.components.AuthScreenCard
 import com.example.ui.components.ConvertBalanceDialog
+import com.example.ui.components.EmailVerificationCard
 import com.example.ui.components.CurrencyConverterCard
 import com.example.ui.components.CustomRateDialog
 import com.example.ui.components.DenominationCard
@@ -424,8 +425,23 @@ fun MainScreen(
                         // TAB 1: WORKING ACCOUNT, SEND & RECEIVE
                         val user = walletUiState.currentUser
                         val account = walletUiState.userAccount
+                        val pendingVerificationUser = walletUiState.pendingVerificationUser
 
-                        if (account == null) {
+                        if (pendingVerificationUser != null && !walletUiState.isEmailVerified) {
+                            item {
+                                EmailVerificationCard(
+                                    email = pendingVerificationUser.email,
+                                    isLoading = walletUiState.isAuthLoading,
+                                    cooldownSeconds = walletUiState.resendCooldownSeconds,
+                                    errorMessage = walletUiState.authErrorMessage,
+                                    successMessage = walletUiState.authSuccessMessage,
+                                    onCheckStatus = { walletViewModel.checkVerificationStatus() },
+                                    onResendEmail = { walletViewModel.resendVerification() },
+                                    onVerifyOtp = { otp -> walletViewModel.verifyOtp(otp) },
+                                    onCancelOrSignOut = { walletViewModel.cancelPendingVerification() }
+                                )
+                            }
+                        } else if (account == null) {
                             item {
                                 AuthScreenCard(
                                     isLoading = walletUiState.isAuthLoading,

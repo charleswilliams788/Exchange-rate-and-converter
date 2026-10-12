@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,9 @@ import java.util.Locale
 data class WalletUiState(
     val currentUser: FirebaseUser? = null,
     val localUser: AuthUserData? = null,
+    val pendingVerificationUser: AuthUserData? = null,
+    val isEmailVerified: Boolean = false,
+    val resendCooldownSeconds: Int = 0,
     val userAccount: UserAccount? = null,
     val transactions: List<WalletTransaction> = emptyList(),
     val isAuthLoading: Boolean = false,
@@ -34,7 +38,7 @@ data class WalletUiState(
     val statusMessage: String? = null
 ) {
     val isAuthenticated: Boolean
-        get() = userAccount != null
+        get() = userAccount != null && isEmailVerified
 }
 
 class WalletViewModel(application: Application) : AndroidViewModel(application) {
@@ -43,11 +47,9 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
     } catch (e: Exception) {
         null
     }
+
     private val auth: FirebaseAuth? = try {
-        if (com.google.firebase.FirebaseApp.getApps(application).isEmpty()) {
-            com.google.firebase.FirebaseApp.initializeApp(application)
-        }
-        Firebase.auth
+        AuthHelper.getFirebaseAuth(application)
     } catch (e: Exception) {
         null
     }
@@ -57,6 +59,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
 
     private var accountObservationJob: Job? = null
     private var transactionsObservationJob: Job? = null
+    private var cooldownJob: Job? = null
 
     init {
         // Listen to Firebase Auth state
@@ -65,20 +68,61 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                 val user = firebaseAuth.currentUser
                 _uiState.update { it.copy(currentUser = user) }
                 if (user != null) {
-                    onFirebaseUserLoggedIn(user)
+                    if (user.isEmailVerified) {
+                        _uiState.update {
+                            it.copy(
+                                isEmailVerified = true,
+                                pendingVerificationUser = null
+                            )
+                        }
+                        onFirebaseUserLoggedIn(user)
+                    } else {
+                        // Firebase user is unverified - gate protected features
+                        val pendingData = AuthUserData(
+                            uid = user.uid,
+                            email = user.email ?: "",
+                            displayName = user.displayName ?: user.email?.substringBefore("@") ?: "User",
+                            isEmailVerified = false
+                        )
+                        _uiState.update {
+                            it.copy(
+                                pendingVerificationUser = pendingData,
+                                isEmailVerified = false,
+                                userAccount = null,
+                                transactions = emptyList()
+                            )
+                        }
+                        updateCooldownTimer(pendingData.email)
+                    }
                 }
             }
         } catch (e: Exception) {
-            // Ignore if Firebase Auth is not active
+            // Firebase Auth not initialized
         }
 
-        // Check local saved session or Firebase auth on launch
-        if (auth?.currentUser != null) {
-            onFirebaseUserLoggedIn(auth.currentUser!!)
-        } else {
+        // Check local session if no Firebase user
+        if (auth?.currentUser == null) {
             val localUser = AuthHelper.getLocalUser(application)
             if (localUser != null) {
-                loadAccountForUser(localUser.uid, localUser.displayName, localUser.email)
+                if (localUser.isEmailVerified) {
+                    _uiState.update {
+                        it.copy(
+                            localUser = localUser,
+                            isEmailVerified = true,
+                            pendingVerificationUser = null
+                        )
+                    }
+                    loadAccountForUser(localUser.uid, localUser.displayName, localUser.email)
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            pendingVerificationUser = localUser,
+                            isEmailVerified = false,
+                            userAccount = null
+                        )
+                    }
+                    updateCooldownTimer(localUser.email)
+                }
             }
         }
     }
@@ -89,14 +133,30 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             val result = AuthHelper.signUpWithEmail(getApplication(), email, pass, name)
             if (result.isSuccess) {
                 val user = result.getOrThrow()
-                _uiState.update {
-                    it.copy(
-                        isAuthLoading = false,
-                        localUser = user,
-                        authSuccessMessage = "Account created successfully! Welcome to NairaRate."
-                    )
+                if (user.isEmailVerified) {
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            localUser = user,
+                            pendingVerificationUser = null,
+                            isEmailVerified = true,
+                            authSuccessMessage = "Account created and verified! Welcome to NairaRate."
+                        )
+                    }
+                    loadAccountForUser(user.uid, user.displayName, user.email)
+                } else {
+                    // Prevent unverified user from accessing protected features
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            pendingVerificationUser = user,
+                            isEmailVerified = false,
+                            userAccount = null,
+                            authSuccessMessage = "Verification email sent to ${user.email}. Please click the link in your email to verify your account."
+                        )
+                    }
+                    startCooldownCountdown(user.email)
                 }
-                loadAccountForUser(user.uid, user.displayName, user.email)
             } else {
                 _uiState.update {
                     it.copy(
@@ -114,14 +174,30 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             val result = AuthHelper.signInWithEmail(getApplication(), email, pass)
             if (result.isSuccess) {
                 val user = result.getOrThrow()
-                _uiState.update {
-                    it.copy(
-                        isAuthLoading = false,
-                        localUser = user,
-                        authSuccessMessage = "Welcome back, ${user.displayName}!"
-                    )
+                if (user.isEmailVerified) {
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            localUser = user,
+                            pendingVerificationUser = null,
+                            isEmailVerified = true,
+                            authSuccessMessage = "Welcome back, ${user.displayName}!"
+                        )
+                    }
+                    loadAccountForUser(user.uid, user.displayName, user.email)
+                } else {
+                    // Prevent access to protected account features
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            pendingVerificationUser = user,
+                            isEmailVerified = false,
+                            userAccount = null,
+                            authErrorMessage = "Email verification required. Please verify your email to access your wallet features."
+                        )
+                    }
+                    updateCooldownTimer(user.email)
                 }
-                loadAccountForUser(user.uid, user.displayName, user.email)
             } else {
                 _uiState.update {
                     it.copy(
@@ -130,6 +206,136 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                     )
                 }
             }
+        }
+    }
+
+    fun checkVerificationStatus() {
+        val pendingUser = _uiState.value.pendingVerificationUser ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAuthLoading = true, authErrorMessage = null, authSuccessMessage = null) }
+            val result = AuthHelper.checkVerificationStatus(getApplication(), pendingUser.email)
+            if (result.isSuccess) {
+                val verified = result.getOrThrow()
+                if (verified) {
+                    val verifiedUser = pendingUser.copy(isEmailVerified = true)
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            pendingVerificationUser = null,
+                            localUser = verifiedUser,
+                            isEmailVerified = true,
+                            authSuccessMessage = "Email verified successfully! Welcome to your NairaRate wallet."
+                        )
+                    }
+                    loadAccountForUser(verifiedUser.uid, verifiedUser.displayName, verifiedUser.email)
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isAuthLoading = false,
+                            authErrorMessage = "Email has not been verified yet. Please check your inbox and click the verification link, then tap Check Verification Status."
+                        )
+                    }
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        authErrorMessage = result.exceptionOrNull()?.message ?: "Failed to verify email status"
+                    )
+                }
+            }
+        }
+    }
+
+    fun resendVerification() {
+        val pendingUser = _uiState.value.pendingVerificationUser ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAuthLoading = true, authErrorMessage = null, authSuccessMessage = null) }
+            val result = AuthHelper.resendVerificationEmail(getApplication(), pendingUser.email)
+            if (result.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        authSuccessMessage = result.getOrThrow()
+                    )
+                }
+                startCooldownCountdown(pendingUser.email)
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        authErrorMessage = result.exceptionOrNull()?.message ?: "Failed to resend verification email"
+                    )
+                }
+                updateCooldownTimer(pendingUser.email)
+            }
+        }
+    }
+
+    fun verifyOtp(code: String) {
+        val pendingUser = _uiState.value.pendingVerificationUser ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAuthLoading = true, authErrorMessage = null, authSuccessMessage = null) }
+            val result = AuthHelper.verifyOtpCode(getApplication(), pendingUser.email, code)
+            if (result.isSuccess) {
+                val verifiedUser = pendingUser.copy(isEmailVerified = true)
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        pendingVerificationUser = null,
+                        localUser = verifiedUser,
+                        isEmailVerified = true,
+                        authSuccessMessage = "Verification successful! Welcome to your wallet."
+                    )
+                }
+                loadAccountForUser(verifiedUser.uid, verifiedUser.displayName, verifiedUser.email)
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        authErrorMessage = result.exceptionOrNull()?.message ?: "Invalid verification code"
+                    )
+                }
+            }
+        }
+    }
+
+    fun cancelPendingVerification() {
+        _uiState.update {
+            it.copy(
+                pendingVerificationUser = null,
+                isEmailVerified = false,
+                userAccount = null,
+                transactions = emptyList(),
+                authErrorMessage = null,
+                authSuccessMessage = null
+            )
+        }
+        AuthHelper.clearLocalSession(getApplication())
+        try {
+            auth?.signOut()
+        } catch (e: Exception) {
+            // ignore
+        }
+    }
+
+    private fun startCooldownCountdown(email: String) {
+        cooldownJob?.cancel()
+        cooldownJob = viewModelScope.launch {
+            while (true) {
+                val remaining = AuthHelper.getCooldownSecondsRemaining(getApplication(), email)
+                _uiState.update { it.copy(resendCooldownSeconds = remaining) }
+                if (remaining <= 0) break
+                delay(1000L)
+            }
+        }
+    }
+
+    private fun updateCooldownTimer(email: String) {
+        val remaining = AuthHelper.getCooldownSecondsRemaining(getApplication(), email)
+        _uiState.update { it.copy(resendCooldownSeconds = remaining) }
+        if (remaining > 0) {
+            startCooldownCountdown(email)
         }
     }
 
@@ -151,11 +357,14 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         val demoUser = AuthUserData(
             uid = "user_amelie",
             email = "achuchiemelie2507@gmail.com",
-            displayName = "Chiemelie Achu"
+            displayName = "Chiemelie Achu",
+            isEmailVerified = true
         )
         _uiState.update {
             it.copy(
                 localUser = demoUser,
+                pendingVerificationUser = null,
+                isEmailVerified = true,
                 authErrorMessage = null,
                 authSuccessMessage = null
             )
@@ -259,13 +468,25 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         val userData = AuthUserData(
             uid = user.uid,
             email = user.email ?: "",
-            displayName = user.displayName ?: "Chiemelie Achu"
+            displayName = user.displayName ?: user.email?.substringBefore("@") ?: "User",
+            isEmailVerified = user.isEmailVerified
         )
-        _uiState.update { it.copy(localUser = userData) }
-        loadAccountForUser(userData.uid, userData.displayName, userData.email)
+        _uiState.update {
+            it.copy(
+                localUser = userData,
+                isEmailVerified = user.isEmailVerified
+            )
+        }
+        if (user.isEmailVerified) {
+            loadAccountForUser(userData.uid, userData.displayName, userData.email)
+        }
     }
 
     fun updateProfile(displayName: String, accountTag: String, bankName: String) {
+        if (!_uiState.value.isEmailVerified) {
+            _uiState.update { it.copy(statusMessage = "Email verification required to edit profile.") }
+            return
+        }
         val current = _uiState.value.userAccount ?: return
         val updated = current.copy(
             displayName = displayName.trim().ifEmpty { current.displayName },
@@ -290,6 +511,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
     fun signOut(credentialManager: CredentialManager) {
         accountObservationJob?.cancel()
         transactionsObservationJob?.cancel()
+        cooldownJob?.cancel()
         AuthHelper.signOut(
             context = getApplication(),
             credentialManager = credentialManager,
@@ -298,6 +520,8 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                     it.copy(
                         currentUser = null,
                         localUser = null,
+                        pendingVerificationUser = null,
+                        isEmailVerified = false,
                         userAccount = null,
                         transactions = emptyList(),
                         authErrorMessage = null,
@@ -323,6 +547,10 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         exchangeRate: Double,
         note: String
     ) {
+        if (!_uiState.value.isEmailVerified) {
+            _uiState.update { it.copy(statusMessage = "Email verification required to transfer funds.") }
+            return
+        }
         val currentAcc = _uiState.value.userAccount
         if (currentAcc == null) {
             _uiState.update { it.copy(statusMessage = "Please sign in to send money") }
@@ -394,6 +622,10 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         amount: Double,
         exchangeRate: Double
     ) {
+        if (!_uiState.value.isEmailVerified) {
+            _uiState.update { it.copy(statusMessage = "Email verification required to convert balances.") }
+            return
+        }
         val currentAcc = _uiState.value.userAccount
         if (currentAcc == null) {
             _uiState.update { it.copy(statusMessage = "Please sign in to convert balances") }
@@ -455,6 +687,10 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun depositTestFunds(amount: Double, currency: String) {
+        if (!_uiState.value.isEmailVerified) {
+            _uiState.update { it.copy(statusMessage = "Email verification required to deposit funds.") }
+            return
+        }
         val currentAcc = _uiState.value.userAccount
         if (currentAcc == null) {
             _uiState.update { it.copy(statusMessage = "Please sign in to add funds") }
