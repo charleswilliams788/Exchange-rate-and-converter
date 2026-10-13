@@ -1,8 +1,6 @@
 package com.example.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CallMade
+import androidx.compose.material.icons.automirrored.filled.CallReceived
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CallReceived
-import androidx.compose.material.icons.filled.CallMade
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.CurrencyExchange
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -33,58 +27,59 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.UserAccount
-import com.example.ui.theme.EmeraldPrimaryLight
-import com.example.ui.theme.NairaGold
-import java.text.NumberFormat
-import java.util.Locale
+import com.example.ui.theme.VeltroElectricBlue
+import com.example.ui.theme.VeltroEmeraldGreen
+import com.example.ui.theme.VeltroMidnightNavy
+import com.example.ui.theme.VeltroMidnightNavyBorder
+import com.example.ui.theme.VeltroMidnightNavyCard
 
+/**
+ * Simplified Midnight Navy Account Card for Veltro Send & Receive tab.
+ * Virtual bank name, virtual account numbers, and static 250k NGN / 200 USD balance cards
+ * have been removed as required. The authenticated user's email/username is dynamically displayed
+ * near the top-right corner.
+ */
 @Composable
 fun AccountOverviewCard(
     account: UserAccount,
+    userEmail: String = "",
+    cryptoBalances: Map<String, Double> = emptyMap(),
     onSendClick: () -> Unit,
     onReceiveClick: () -> Unit,
     onConvertClick: () -> Unit,
-    onAddFundsClick: () -> Unit,
-    onCopyAccount: (String) -> Unit,
+    onAddFundsClick: () -> Unit = {},
+    onCopyAccount: (String) -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var hideBalance by remember { mutableStateOf(false) }
-
-    val formattedNgn = NumberFormat.getNumberInstance(Locale.US).apply {
-        minimumFractionDigits = 2
-        maximumFractionDigits = 2
-    }.format(account.ngnBalance)
-
-    val formattedUsd = NumberFormat.getNumberInstance(Locale.US).apply {
-        minimumFractionDigits = 2
-        maximumFractionDigits = 2
-    }.format(account.usdBalance)
+    val displayEmailOrUser = when {
+        userEmail.isNotBlank() -> userEmail
+        account.email.isNotBlank() -> account.email
+        account.displayName.isNotBlank() -> account.displayName
+        else -> "demo@veltro.org"
+    }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .testTag("account_overview_card"),
-        shape = RoundedCornerShape(26.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(22.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = VeltroMidnightNavy
+        ),
+        border = androidx.compose.foundation.BorderStroke(1.dp, VeltroMidnightNavyBorder)
     ) {
         Column(
             modifier = Modifier
@@ -92,256 +87,247 @@ fun AccountOverviewCard(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            MaterialTheme.colorScheme.surface
+                            VeltroMidnightNavyCard,
+                            VeltroMidnightNavy
                         )
                     )
                 )
-                .padding(20.dp)
+                .padding(horizontal = 20.dp, vertical = 18.dp)
         ) {
-            // Header with Account info and Tag
+            // Top Row: Brand Chip on Left, Dynamic User Email on Right
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                // Veltro Brand Chip with Electric Blue accent
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = VeltroElectricBlue.copy(alpha = 0.15f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, VeltroElectricBlue.copy(alpha = 0.35f))
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     ) {
-                        Text(
-                            text = account.displayName.ifEmpty { "Working Account" },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .background(VeltroEmeraldGreen, CircleShape)
                         )
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.padding(start = 2.dp)
-                        ) {
-                            Text(
-                                text = "ACTIVE",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
                         Text(
-                            text = "${account.bankName} • ${account.accountNumber}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = "VELTRO DEMO WALLET",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = VeltroElectricBlue,
+                            letterSpacing = 0.5.sp
                         )
-                        IconButton(
-                            onClick = { onCopyAccount(account.accountNumber) },
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ContentCopy,
-                                contentDescription = "Copy account number",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(14.dp)
-                            )
-                        }
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Profile Dialog Trigger
+                // Authenticated user's email/username dynamically displayed near top-right
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color.White.copy(alpha = 0.08f),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
+                        modifier = Modifier.testTag("user_email_display")
+                    ) {
+                        Text(
+                            text = displayEmailOrUser,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
+                        )
+                    }
+
                     IconButton(
                         onClick = onEditProfileClick,
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(34.dp)
                             .testTag("btn_dashboard_profile")
                     ) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Edit Profile",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-
-                    // Balance Visibility Toggle
-                    IconButton(
-                        onClick = { hideBalance = !hideBalance },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .testTag("btn_toggle_balance")
-                    ) {
-                        Icon(
-                            imageVector = if (hideBalance) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = "Toggle Balance",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            contentDescription = "Profile Details",
+                            tint = VeltroElectricBlue,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Balances Row: NGN on left, USD on right
+            // Demonstration Balances Row (starts at zero for all assets)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // NGN Balance Box
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 6.dp)
-                ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(text = "🇳🇬", fontSize = 16.sp)
-                            Text(
-                                text = "Naira Balance",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = if (hideBalance) "₦••••••" else "₦$formattedNgn",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            maxLines = 1
-                        )
-                    }
-                }
-
-                // USD Balance Box
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 6.dp)
-                ) {
-                    Column(modifier = Modifier.padding(14.dp)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(text = "🇺🇸", fontSize = 16.sp)
-                            Text(
-                                text = "Dollar Balance",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = if (hideBalance) "$••••••" else "$$formattedUsd",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            maxLines = 1
-                        )
-                    }
-                }
+                Text(
+                    text = "DEMO ASSETS",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF94A3B8),
+                    letterSpacing = 0.5.sp
+                )
+                Text(
+                    text = "Credited on Completed",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = VeltroElectricBlue,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Action Buttons: Send, Receive, Convert, Add Funds
+            // Multi-Asset Balances Pills Grid
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                QuickWalletAction(
-                    icon = Icons.Default.CallMade,
-                    label = "Send",
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    onClick = onSendClick,
-                    modifier = Modifier.testTag("action_send_money")
+                CryptoBalPill(
+                    symbol = "USDT",
+                    balance = cryptoBalances["USDT"] ?: 0.0,
+                    formatDecimals = 2,
+                    modifier = Modifier.weight(1f)
                 )
+                CryptoBalPill(
+                    symbol = "ETH",
+                    balance = cryptoBalances["ETH"] ?: 0.0,
+                    formatDecimals = 4,
+                    modifier = Modifier.weight(1f)
+                )
+                CryptoBalPill(
+                    symbol = "BNB",
+                    balance = cryptoBalances["BNB"] ?: 0.0,
+                    formatDecimals = 4,
+                    modifier = Modifier.weight(1f)
+                )
+                CryptoBalPill(
+                    symbol = "SOL",
+                    balance = cryptoBalances["SOL"] ?: 0.0,
+                    formatDecimals = 4,
+                    modifier = Modifier.weight(1f)
+                )
+                CryptoBalPill(
+                    symbol = "USDC",
+                    balance = cryptoBalances["USDC"] ?: 0.0,
+                    formatDecimals = 2,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
-                QuickWalletAction(
-                    icon = Icons.Default.CallReceived,
-                    label = "Receive",
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Action Buttons with Electric Blue accents
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                FilledTonalButton(
                     onClick = onReceiveClick,
-                    modifier = Modifier.testTag("action_receive_money")
-                )
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                        containerColor = VeltroElectricBlue,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("action_deposit_crypto")
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.CallReceived,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Deposit", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
 
-                QuickWalletAction(
-                    icon = Icons.Default.CurrencyExchange,
-                    label = "Convert",
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                FilledTonalButton(
+                    onClick = onSendClick,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.12f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("action_send_money")
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.CallMade,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Send", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+
+                FilledTonalButton(
                     onClick = onConvertClick,
-                    modifier = Modifier.testTag("action_convert_balance")
-                )
-
-                QuickWalletAction(
-                    icon = Icons.Default.Add,
-                    label = "Add Funds",
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    onClick = onAddFundsClick,
-                    modifier = Modifier.testTag("action_add_funds")
-                )
+                    shape = RoundedCornerShape(12.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                        containerColor = Color.White.copy(alpha = 0.12f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag("action_convert_balance")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CurrencyExchange,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Swap", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun QuickWalletAction(
-    icon: ImageVector,
-    label: String,
-    containerColor: Color,
-    contentColor: Color,
-    onClick: () -> Unit,
+private fun CryptoBalPill(
+    symbol: String,
+    balance: Double,
+    formatDecimals: Int,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Surface(
+        shape = RoundedCornerShape(10.dp),
+        color = Color(0xFF1F2937),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF374151)),
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 4.dp, vertical = 2.dp)
     ) {
-        Surface(
-            shape = CircleShape,
-            color = containerColor,
-            modifier = Modifier.size(50.dp)
+        Column(
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = contentColor,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
+            Text(
+                text = symbol,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF94A3B8)
+            )
+            Text(
+                text = String.format(java.util.Locale.US, "%.${formatDecimals}f", balance),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold,
+                fontFamily = FontFamily.Monospace,
+                color = Color.White,
+                maxLines = 1
+            )
         }
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }

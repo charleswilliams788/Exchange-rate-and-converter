@@ -145,7 +145,7 @@ fun ProfileDialog(
 
                 // Email (Read-only)
                 OutlinedTextField(
-                    value = account.email.ifEmpty { "achuchiemelie2507@gmail.com" },
+                    value = account.email.ifEmpty { "demo@veltro.org" },
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Email Address (Protected)") },

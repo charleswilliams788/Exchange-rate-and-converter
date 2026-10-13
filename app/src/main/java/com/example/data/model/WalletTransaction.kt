@@ -14,7 +14,7 @@ data class WalletTransaction(
     val recipientId: String = "",
     val recipientName: String = "",
     val recipientAccount: String = "",
-    val recipientBank: String = "NairaRate MFB",
+    val recipientBank: String = "Veltro MFB",
     val amount: Double = 0.0,
     val currency: String = "NGN", // USD or NGN
     val exchangeRate: Double = 1.0,

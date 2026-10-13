@@ -64,22 +64,22 @@ object EmailService {
     ): EmailDispatchResult {
         try {
             val payload = JSONObject().apply {
-                put("from", "NairaRate <onboarding@resend.dev>")
+                put("from", "Veltro <onboarding@resend.dev>")
                 put("to", JSONArray().put(recipientEmail))
-                put("subject", "Your NairaRate Verification Code: $code")
+                put("subject", "Your Veltro Verification Code: $code")
                 put(
                     "html",
                     """
                     <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 14px; background: #ffffff;">
-                        <h2 style="color: #1565c0; margin-top: 0; font-size: 22px;">NairaRate Account Verification</h2>
+                        <h2 style="color: #3B82F6; margin-top: 0; font-size: 22px;">Veltro Account Verification</h2>
                         <p style="color: #333; font-size: 15px;">Hello ${recipientName.ifBlank { "User" }},</p>
                         <p style="color: #555; font-size: 14px; line-height: 1.5;">Thank you for registering. Please enter the following 6-digit verification code to complete your signup:</p>
-                        <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center; margin: 24px 0;">
-                            <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #0d47a1; font-family: monospace;">$code</span>
+                        <div style="background: #EFF6FF; padding: 20px; border-radius: 10px; text-align: center; margin: 24px 0; border: 1px solid #BFDBFE;">
+                            <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1D4ED8; font-family: monospace;">$code</span>
                         </div>
                         <p style="color: #777; font-size: 13px;">This verification code will expire in <strong>10 minutes</strong>. If you did not request this code, you can safely ignore this email.</p>
                         <hr style="border: none; border-top: 1px solid #eeeeee; margin: 20px 0;" />
-                        <p style="color: #999; font-size: 11px; text-align: center;">NairaRate Secure Authentication System</p>
+                        <p style="color: #999; font-size: 11px; text-align: center;">Veltro: Your Money. Without Borders.</p>
                     </div>
                     """.trimIndent()
                 )
@@ -118,19 +118,19 @@ object EmailService {
         try {
             val payload = JSONObject().apply {
                 put("sender", JSONObject().apply {
-                    put("name", "NairaRate")
-                    put("email", "support@nairarate.com")
+                    put("name", "Veltro")
+                    put("email", "support@veltro.org")
                 })
                 put("to", JSONArray().put(JSONObject().apply {
                     put("email", recipientEmail)
                     put("name", recipientName)
                 }))
-                put("subject", "Your NairaRate Verification Code: $code")
+                put("subject", "Your Veltro Verification Code: $code")
                 put(
                     "htmlContent",
                     """
                     <div style="font-family: Arial, sans-serif; max-width: 500px; padding: 20px;">
-                        <h2>NairaRate Verification</h2>
+                        <h2>Veltro Verification</h2>
                         <p>Your 6-digit verification code is: <strong>$code</strong></p>
                         <p>This code will expire in 10 minutes.</p>
                     </div>

@@ -12,7 +12,7 @@ data class UserAccount(
     val email: String = "",
     val accountNumber: String = "",
     val accountTag: String = "",
-    val bankName: String = "NairaRate MFB",
+    val bankName: String = "Veltro MFB",
     val ngnBalance: Double = 0.0,
     val usdBalance: Double = 0.0,
     @ServerTimestamp val createdAt: Timestamp? = null,

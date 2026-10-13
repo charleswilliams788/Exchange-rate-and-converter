@@ -175,16 +175,16 @@ fun MainScreen(
                         }
                         Column {
                             Text(
-                                text = "NairaRate",
+                                text = "Veltro",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = if (walletUiState.currentUser != null) {
-                                    walletUiState.userAccount?.accountTag ?: "Working Account Active"
+                                    walletUiState.userAccount?.accountTag ?: "Veltro Wallet Active"
                                 } else {
-                                    "USD / NGN Live Converter"
+                                    "Your Money. Without Borders."
                                 },
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -466,13 +466,12 @@ fun MainScreen(
                             item {
                                 AccountOverviewCard(
                                     account = account,
+                                    userEmail = user?.email ?: account.email,
+                                    cryptoBalances = walletUiState.cryptoBalances,
                                     onSendClick = { showSendMoneyDialog = true },
                                     onReceiveClick = { showReceiveMoneyDialog = true },
                                     onConvertClick = { showConvertBalanceDialog = true },
-                                    onAddFundsClick = {
-                                        // Quick add test funds
-                                        walletViewModel.depositTestFunds(50000.0, "NGN")
-                                    },
+                                    onAddFundsClick = { },
                                     onCopyAccount = copyToClipboard,
                                     onEditProfileClick = { showProfileDialog = true }
                                 )
@@ -555,6 +554,9 @@ fun MainScreen(
         ReceiveMoneyDialog(
             account = walletUiState.userAccount!!,
             onCopyText = copyToClipboard,
+            onSubmitDeposit = { crypto, network, amt ->
+                walletViewModel.submitSimulatedDeposit(crypto, network, amt)
+            },
             onDismiss = { showReceiveMoneyDialog = false }
         )
     }

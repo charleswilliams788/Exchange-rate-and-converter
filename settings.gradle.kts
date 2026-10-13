@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "NairaRate"
+rootProject.name = "Veltro"
 
 include(":app")

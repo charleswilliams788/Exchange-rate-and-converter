@@ -2,44 +2,66 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Light Scheme Colors - Emerald & Warm Gold
-val EmeraldPrimaryLight = Color(0xFF008751) // Nigerian green tone
-val EmeraldOnPrimaryLight = Color(0xFFFFFFFF)
-val EmeraldPrimaryContainerLight = Color(0xFFC7F5D9)
-val EmeraldOnPrimaryContainerLight = Color(0xFF003920)
+// Veltro Brand Color Palette
+val VeltroElectricBlue = Color(0xFF3B82F6) // Primary buttons, active nav, icons, accents
+val VeltroElectricBlueDark = Color(0xFF1D4ED8)
+val VeltroElectricBlueContainer = Color(0xFFEFF6FF)
+val VeltroOnElectricBlueContainer = Color(0xFF1E40AF)
 
-val AmberSecondaryLight = Color(0xFFB45309)
-val AmberOnSecondaryLight = Color(0xFFFFFFFF)
-val AmberSecondaryContainerLight = Color(0xFFFEF3C7)
-val AmberOnSecondaryContainerLight = Color(0xFF78350F)
+val VeltroMidnightNavy = Color(0xFF111827) // Dark dashboard & dark interface sections
+val VeltroMidnightNavyCard = Color(0xFF1F2937)
+val VeltroMidnightNavyBorder = Color(0xFF374151)
 
-val SlateBackgroundLight = Color(0xFFF7FAF8)
-val SlateOnBackgroundLight = Color(0xFF131F18)
-val SlateSurfaceLight = Color(0xFFFFFFFF)
-val SlateOnSurfaceLight = Color(0xFF131F18)
-val SlateSurfaceVariantLight = Color(0xFFE6EFE9)
-val SlateOnSurfaceVariantLight = Color(0xFF404E45)
+val VeltroCoolWhite = Color(0xFFF8FAFC) // Main background
+val VeltroWhite = Color(0xFFFFFFFF) // Cards, surfaces
+val VeltroSlateGray = Color(0xFF64748B) // Secondary text & borders
+val VeltroSlateLight = Color(0xFFE2E8F0)
 
-// Dark Scheme Colors - Deep Forest Emerald & Glowing Mint
-val EmeraldPrimaryDark = Color(0xFF34D399)
-val EmeraldOnPrimaryDark = Color(0xFF003820)
-val EmeraldPrimaryContainerDark = Color(0xFF065F38)
-val EmeraldOnPrimaryContainerDark = Color(0xFFA7F3D0)
+val VeltroEmeraldGreen = Color(0xFF10B981) // Successful transactions & positive indicators
+val VeltroEmeraldGreenContainer = Color(0xFFD1FAE5)
+val VeltroOnEmeraldGreenContainer = Color(0xFF047857)
 
-val AmberSecondaryDark = Color(0xFFFBBF24)
-val AmberOnSecondaryDark = Color(0xFF451A03)
-val AmberSecondaryContainerDark = Color(0xFF78350F)
-val AmberOnSecondaryContainerDark = Color(0xFFFDE68A)
+val VeltroAmberWarning = Color(0xFFF59E0B)
+val VeltroRedDanger = Color(0xFFEF4444)
 
-val DeepBackgroundDark = Color(0xFF0A140F)
-val DeepOnBackgroundDark = Color(0xFFE1EBE4)
-val DeepSurfaceDark = Color(0xFF112119)
-val DeepOnSurfaceDark = Color(0xFFE1EBE4)
-val DeepSurfaceVariantDark = Color(0xFF1A3327)
-val DeepOnSurfaceVariantDark = Color(0xFF9FB5A8)
+// Light Scheme Colors
+val ElectricBluePrimaryLight = VeltroElectricBlue
+val ElectricBlueOnPrimaryLight = Color(0xFFFFFFFF)
+val ElectricBluePrimaryContainerLight = VeltroElectricBlueContainer
+val ElectricBlueOnPrimaryContainerLight = VeltroOnElectricBlueContainer
 
-// Accent and status colors
-val RatePositiveGreen = Color(0xFF10B981)
-val RateNegativeRed = Color(0xFFEF4444)
+val SlateSecondaryLight = VeltroSlateGray
+val SlateOnSecondaryLight = Color(0xFFFFFFFF)
+val SlateSecondaryContainerLight = Color(0xFFF1F5F9)
+val SlateOnSecondaryContainerLight = Color(0xFF334155)
+
+val CoolWhiteBackgroundLight = VeltroCoolWhite
+val CoolWhiteOnBackgroundLight = Color(0xFF0F172A)
+val WhiteSurfaceLight = VeltroWhite
+val WhiteOnSurfaceLight = Color(0xFF0F172A)
+val SlateSurfaceVariantLight = Color(0xFFF1F5F9)
+val SlateOnSurfaceVariantLight = Color(0xFF475569)
+
+// Dark Scheme Colors
+val ElectricBluePrimaryDark = Color(0xFF60A5FA)
+val ElectricBlueOnPrimaryDark = Color(0xFF1E3A8A)
+val ElectricBluePrimaryContainerDark = Color(0xFF1E40AF)
+val ElectricBlueOnPrimaryContainerDark = Color(0xFFDBEAFE)
+
+val SlateSecondaryDark = Color(0xFF94A3B8)
+val SlateOnSecondaryDark = Color(0xFF0F172A)
+val SlateSecondaryContainerDark = Color(0xFF334155)
+val SlateOnSecondaryContainerDark = Color(0xFFE2E8F0)
+
+val MidnightNavyBackgroundDark = VeltroMidnightNavy
+val MidnightNavyOnBackgroundDark = Color(0xFFF8FAFC)
+val MidnightNavySurfaceDark = VeltroMidnightNavyCard
+val MidnightNavyOnSurfaceDark = Color(0xFFF8FAFC)
+val MidnightNavySurfaceVariantDark = Color(0xFF374151)
+val MidnightNavyOnSurfaceVariantDark = Color(0xFF94A3B8)
+
+// Status colors
+val RatePositiveGreen = VeltroEmeraldGreen
+val RateNegativeRed = VeltroRedDanger
 val NairaGold = Color(0xFFF59E0B)
-val UsdBlue = Color(0xFF2563EB)
+val UsdBlue = VeltroElectricBlue

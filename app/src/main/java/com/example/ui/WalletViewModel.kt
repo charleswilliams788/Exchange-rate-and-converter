@@ -30,6 +30,14 @@ data class WalletUiState(
     val isEmailVerified: Boolean = false,
     val resendCooldownSeconds: Int = 0,
     val userAccount: UserAccount? = null,
+    val cryptoBalances: Map<String, Double> = mapOf(
+        "USDT" to 0.0,
+        "ETH" to 0.0,
+        "BNB" to 0.0,
+        "SOL" to 0.0,
+        "USDC" to 0.0
+    ),
+    val creditedDepositIds: Set<String> = emptySet(),
     val transactions: List<WalletTransaction> = emptyList(),
     val isAuthLoading: Boolean = false,
     val isActionLoading: Boolean = false,
@@ -100,28 +108,29 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             // Firebase Auth not initialized
         }
 
-        // Check local session if no Firebase user
+        // Check local persisted session if Firebase not active
         if (auth?.currentUser == null) {
-            val localUser = AuthHelper.getLocalUser(application)
-            if (localUser != null) {
-                if (localUser.isEmailVerified) {
+            val localSession = AuthHelper.getLocalUser(application)
+            if (localSession != null) {
+                if (localSession.isEmailVerified) {
                     _uiState.update {
                         it.copy(
-                            localUser = localUser,
+                            localUser = localSession,
                             isEmailVerified = true,
                             pendingVerificationUser = null
                         )
                     }
-                    loadAccountForUser(localUser.uid, localUser.displayName, localUser.email)
+                    loadAccountForUser(localSession.uid, localSession.displayName, localSession.email)
                 } else {
                     _uiState.update {
                         it.copy(
-                            pendingVerificationUser = localUser,
+                            pendingVerificationUser = localSession,
                             isEmailVerified = false,
-                            userAccount = null
+                            userAccount = null,
+                            transactions = emptyList()
                         )
                     }
-                    updateCooldownTimer(localUser.email)
+                    updateCooldownTimer(localSession.email)
                 }
             }
         }
@@ -140,7 +149,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                             localUser = user,
                             pendingVerificationUser = null,
                             isEmailVerified = true,
-                            authSuccessMessage = "Account created and verified! Welcome to NairaRate."
+                            authSuccessMessage = "Account created and verified! Welcome to Veltro."
                         )
                     }
                     loadAccountForUser(user.uid, user.displayName, user.email)
@@ -181,19 +190,18 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                             localUser = user,
                             pendingVerificationUser = null,
                             isEmailVerified = true,
-                            authSuccessMessage = "Welcome back, ${user.displayName}!"
+                            authSuccessMessage = "Welcome back to Veltro!"
                         )
                     }
                     loadAccountForUser(user.uid, user.displayName, user.email)
                 } else {
-                    // Prevent access to protected account features
                     _uiState.update {
                         it.copy(
                             isAuthLoading = false,
                             pendingVerificationUser = user,
                             isEmailVerified = false,
                             userAccount = null,
-                            authErrorMessage = "Email verification required. Please verify your email to access your wallet features."
+                            authSuccessMessage = "Please verify your email address to access your wallet."
                         )
                     }
                     updateCooldownTimer(user.email)
@@ -213,34 +221,24 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         val pendingUser = _uiState.value.pendingVerificationUser ?: return
         viewModelScope.launch {
             _uiState.update { it.copy(isAuthLoading = true, authErrorMessage = null, authSuccessMessage = null) }
-            val result = AuthHelper.checkVerificationStatus(getApplication(), pendingUser.email)
-            if (result.isSuccess) {
-                val verified = result.getOrThrow()
-                if (verified) {
-                    val verifiedUser = pendingUser.copy(isEmailVerified = true)
-                    _uiState.update {
-                        it.copy(
-                            isAuthLoading = false,
-                            pendingVerificationUser = null,
-                            localUser = verifiedUser,
-                            isEmailVerified = true,
-                            authSuccessMessage = "Email verified successfully! Welcome to your NairaRate wallet."
-                        )
-                    }
-                    loadAccountForUser(verifiedUser.uid, verifiedUser.displayName, verifiedUser.email)
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isAuthLoading = false,
-                            authErrorMessage = "Email has not been verified yet. Please check your inbox and click the verification link, then tap Check Verification Status."
-                        )
-                    }
+            val checkResult = AuthHelper.checkVerificationStatus(getApplication(), pendingUser.email)
+            if (checkResult.isSuccess && checkResult.getOrThrow()) {
+                val verifiedUser = pendingUser.copy(isEmailVerified = true)
+                _uiState.update {
+                    it.copy(
+                        isAuthLoading = false,
+                        pendingVerificationUser = null,
+                        localUser = verifiedUser,
+                        isEmailVerified = true,
+                        authSuccessMessage = "Email verified successfully! Welcome to your Veltro wallet."
+                    )
                 }
+                loadAccountForUser(verifiedUser.uid, verifiedUser.displayName, verifiedUser.email)
             } else {
                 _uiState.update {
                     it.copy(
                         isAuthLoading = false,
-                        authErrorMessage = result.exceptionOrNull()?.message ?: "Failed to verify email status"
+                        authErrorMessage = "Email not verified yet. Please enter the 6-digit code or check your inbox."
                     )
                 }
             }
@@ -285,7 +283,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                         pendingVerificationUser = null,
                         localUser = verifiedUser,
                         isEmailVerified = true,
-                        authSuccessMessage = "Verification successful! Welcome to your wallet."
+                        authSuccessMessage = "Verification successful! Welcome to your Veltro wallet."
                     )
                 }
                 loadAccountForUser(verifiedUser.uid, verifiedUser.displayName, verifiedUser.email)
@@ -355,9 +353,9 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
 
     fun useDemoAccount() {
         val demoUser = AuthUserData(
-            uid = "user_amelie",
-            email = "achuchiemelie2507@gmail.com",
-            displayName = "Chiemelie Achu",
+            uid = "demo_veltro_user",
+            email = "demo@veltro.org",
+            displayName = "Demo User",
             isEmailVerified = true
         )
         _uiState.update {
@@ -372,64 +370,31 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         loadAccountForUser(demoUser.uid, demoUser.displayName, demoUser.email)
     }
 
+    // Loads account with ZERO STARTING BALANCES as mandated by user
     private fun loadAccountForUser(uid: String, displayName: String, email: String) {
-        val defaultTag = "@" + email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "amelie" }
+        val defaultTag = "@" + email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "veltro" }
         val loadedAccount = UserAccount(
             userId = uid,
-            displayName = displayName.ifEmpty { "Chiemelie Achu" },
-            email = email.ifEmpty { "achuchiemelie2507@gmail.com" },
-            accountNumber = "8144314093",
+            displayName = displayName.ifEmpty { "Demo User" },
+            email = email.ifEmpty { "demo@veltro.org" },
+            accountNumber = "0xe8c91f657af4706e570c8fbb396238db60d136da",
             accountTag = defaultTag,
-            bankName = "NairaRate MFB",
-            ngnBalance = 250000.0,
-            usdBalance = 200.0
-        )
-
-        val starterTransactions = listOf(
-            WalletTransaction(
-                id = "tx_welcome_ngn",
-                senderId = "system",
-                senderName = "Central Bank / Remittance",
-                senderAccount = "0000000000",
-                recipientId = uid,
-                recipientName = loadedAccount.displayName,
-                recipientAccount = "8144314093",
-                recipientBank = "NairaRate MFB",
-                amount = 250000.0,
-                currency = "NGN",
-                exchangeRate = 1.0,
-                convertedAmount = 250000.0,
-                convertedCurrency = "NGN",
-                type = "DEPOSIT",
-                status = "COMPLETED",
-                note = "Starter Naira working balance credited",
-                participants = listOf(uid)
-            ),
-            WalletTransaction(
-                id = "tx_welcome_usd",
-                senderId = "system",
-                senderName = "USD Wire Transfer",
-                senderAccount = "WIRE_REMIT",
-                recipientId = uid,
-                recipientName = loadedAccount.displayName,
-                recipientAccount = "8144314093",
-                recipientBank = "NairaRate MFB",
-                amount = 200.0,
-                currency = "USD",
-                exchangeRate = 1.0,
-                convertedAmount = 200.0,
-                convertedCurrency = "USD",
-                type = "DEPOSIT",
-                status = "COMPLETED",
-                note = "Starter USD working balance credited",
-                participants = listOf(uid)
-            )
+            bankName = "Veltro Vault",
+            ngnBalance = 0.0,
+            usdBalance = 0.0
         )
 
         _uiState.update {
             it.copy(
                 userAccount = loadedAccount,
-                transactions = starterTransactions,
+                cryptoBalances = mapOf(
+                    "USDT" to 0.0,
+                    "ETH" to 0.0,
+                    "BNB" to 0.0,
+                    "SOL" to 0.0,
+                    "USDC" to 0.0
+                ),
+                transactions = emptyList(),
                 isAuthLoading = false
             )
         }
@@ -460,6 +425,84 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
                 }
             } catch (e: Exception) {
                 // Keep local state
+            }
+        }
+    }
+
+    // SIMULATED CRYPTOCURRENCY DEPOSIT WORKFLOW WITH DUPLICATE-CREDITING GUARD
+    fun submitSimulatedDeposit(crypto: String, network: String, amount: Double) {
+        val userAcc = _uiState.value.userAccount ?: return
+        val txId = "demo_dep_${System.currentTimeMillis()}"
+
+        val newTx = WalletTransaction(
+            id = txId,
+            senderId = "simulated_external_wallet",
+            senderName = "Simulated $crypto Depositor",
+            senderAccount = "EXTERNAL",
+            recipientId = userAcc.userId,
+            recipientName = userAcc.displayName,
+            recipientAccount = userAcc.accountNumber,
+            recipientBank = network,
+            amount = amount,
+            currency = crypto,
+            exchangeRate = 1.0,
+            convertedAmount = amount,
+            convertedCurrency = crypto,
+            type = "DEPOSIT",
+            status = "PENDING",
+            note = "Simulated $crypto deposit on $network (Demo Mode)",
+            participants = listOf(userAcc.userId)
+        )
+
+        _uiState.update {
+            it.copy(
+                transactions = listOf(newTx) + it.transactions,
+                statusMessage = "Simulated deposit of $amount $crypto initiated. Awaiting confirmations..."
+            )
+        }
+
+        // Deterministic progression:
+        viewModelScope.launch {
+            delay(2500L)
+            advanceSimulatedDeposit(txId, "CONFIRMING")
+
+            delay(3500L)
+            advanceSimulatedDeposit(txId, "COMPLETED")
+        }
+    }
+
+    // ADVANCE STATUS AND CREDIT BALANCE ONLY ONCE AT COMPLETED STAGE
+    fun advanceSimulatedDeposit(txId: String, newStatus: String) {
+        val currentState = _uiState.value
+        val txList = currentState.transactions.toMutableList()
+        val index = txList.indexOfFirst { it.id == txId }
+        if (index < 0) return
+
+        val existingTx = txList[index]
+        val updatedTx = existingTx.copy(status = newStatus)
+        txList[index] = updatedTx
+
+        val currentBalances = currentState.cryptoBalances.toMutableMap()
+        val creditedIds = currentState.creditedDepositIds.toMutableSet()
+
+        // STRICT CREDITING ONLY AT COMPLETED STAGE, WITH DUPLICATE-CREDITING GUARD
+        if (newStatus.equals("COMPLETED", ignoreCase = true) && !creditedIds.contains(txId)) {
+            val prevBal = currentBalances[updatedTx.currency] ?: 0.0
+            currentBalances[updatedTx.currency] = prevBal + updatedTx.amount
+            creditedIds.add(txId) // Guarded permanently
+            _uiState.update {
+                it.copy(
+                    transactions = txList,
+                    cryptoBalances = currentBalances,
+                    creditedDepositIds = creditedIds,
+                    statusMessage = "Deposit confirmed! +${updatedTx.amount} ${updatedTx.currency} credited to demo balance."
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    transactions = txList
+                )
             }
         }
     }
@@ -558,11 +601,11 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         if (currency == "NGN" && currentAcc.ngnBalance < amount) {
-            _uiState.update { it.copy(statusMessage = "Insufficient NGN balance (Available: ₦${currentAcc.ngnBalance})") }
+            _uiState.update { it.copy(statusMessage = "Insufficient NGN balance") }
             return
         }
         if (currency == "USD" && currentAcc.usdBalance < amount) {
-            _uiState.update { it.copy(statusMessage = "Insufficient USD balance (Available: $${currentAcc.usdBalance})") }
+            _uiState.update { it.copy(statusMessage = "Insufficient USD balance") }
             return
         }
 
@@ -597,7 +640,7 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             it.copy(
                 userAccount = updated,
                 transactions = listOf(newTx) + it.transactions,
-                statusMessage = "Transfer of ${if (currency == "USD") "$" else "₦"}$amount sent successfully!"
+                statusMessage = "Transfer sent successfully!"
             )
         }
 
@@ -675,61 +718,13 @@ class WalletViewModel(application: Application) : AndroidViewModel(application) 
             it.copy(
                 userAccount = updated,
                 transactions = listOf(newTx) + it.transactions,
-                statusMessage = "Converted $amount $fromCurrency to $toCurrency at live rate!"
+                statusMessage = "Converted $amount $fromCurrency to $toCurrency!"
             )
         }
 
         if (auth?.currentUser != null) {
             viewModelScope.launch {
                 repository?.convertOwnBalance(fromCurrency, toCurrency, amount, exchangeRate)
-            }
-        }
-    }
-
-    fun depositTestFunds(amount: Double, currency: String) {
-        if (!_uiState.value.isEmailVerified) {
-            _uiState.update { it.copy(statusMessage = "Email verification required to deposit funds.") }
-            return
-        }
-        val currentAcc = _uiState.value.userAccount
-        if (currentAcc == null) {
-            _uiState.update { it.copy(statusMessage = "Please sign in to add funds") }
-            return
-        }
-
-        val newNgn = if (currency == "NGN") currentAcc.ngnBalance + amount else currentAcc.ngnBalance
-        val newUsd = if (currency == "USD") currentAcc.usdBalance + amount else currentAcc.usdBalance
-        val updated = currentAcc.copy(ngnBalance = newNgn, usdBalance = newUsd)
-        val newTx = WalletTransaction(
-            id = "tx_${System.currentTimeMillis()}",
-            senderId = updated.userId,
-            senderName = "Card / Remittance",
-            senderAccount = "VIRTUAL_TOPUP",
-            recipientId = updated.userId,
-            recipientName = updated.displayName,
-            recipientAccount = updated.accountNumber,
-            recipientBank = updated.bankName,
-            amount = amount,
-            currency = currency,
-            exchangeRate = 1.0,
-            convertedAmount = amount,
-            convertedCurrency = currency,
-            type = "DEPOSIT",
-            status = "COMPLETED",
-            note = "Instant deposit via NairaRate Top-up",
-            participants = listOf(updated.userId)
-        )
-        _uiState.update {
-            it.copy(
-                userAccount = updated,
-                transactions = listOf(newTx) + it.transactions,
-                statusMessage = "Added ${if (currency == "USD") "$" else "₦"}$amount to wallet"
-            )
-        }
-
-        if (auth?.currentUser != null) {
-            viewModelScope.launch {
-                repository?.depositFunds(amount, currency)
             }
         }
     }

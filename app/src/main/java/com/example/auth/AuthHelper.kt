@@ -86,7 +86,7 @@ object AuthHelper {
         val prefs = getPrefs(context)
         val uid = prefs.getString(KEY_LOGGED_IN_UID, null) ?: return null
         val email = prefs.getString(KEY_LOGGED_IN_EMAIL, "") ?: ""
-        val name = prefs.getString(KEY_LOGGED_IN_NAME, "NairaRate User") ?: "NairaRate User"
+        val name = prefs.getString(KEY_LOGGED_IN_NAME, "Veltro User") ?: "Veltro User"
         val isVerified = prefs.getBoolean(KEY_LOGGED_IN_VERIFIED, false)
         return AuthUserData(uid = uid, email = email, displayName = name, isEmailVerified = isVerified)
     }
@@ -339,9 +339,13 @@ object AuthHelper {
         }
 
         // Demo account (automatically verified for quick testing)
-        if (trimmedEmail == "achuchiemelie2507@gmail.com" || trimmedEmail == "user@nairarate.com") {
-            val uid = "user_amelie"
-            val name = "Chiemelie Achu"
+        if (trimmedEmail == "achuchiemelie2507@gmail.com" || trimmedEmail == "user@veltro.org" || trimmedEmail == "user@nairarate.com" || trimmedEmail == "demo@veltro.org") {
+            val uid = if (trimmedEmail == "demo@veltro.org") "demo_veltro_user" else "user_${trimmedEmail.hashCode()}"
+            val name = when (trimmedEmail) {
+                "demo@veltro.org" -> "Demo User"
+                "user@veltro.org", "user@nairarate.com" -> "John Doe"
+                else -> "Chiemelie Achu"
+            }
             saveLocalSession(context, uid, trimmedEmail, name, true)
             return@withContext Result.success(
                 AuthUserData(uid = uid, email = trimmedEmail, displayName = name, isEmailVerified = true)
@@ -580,7 +584,7 @@ object AuthHelper {
             val data = AuthUserData(
                 uid = currentUser.uid,
                 email = currentUser.email ?: "",
-                displayName = currentUser.displayName ?: "NairaRate User",
+                displayName = currentUser.displayName ?: "Veltro User",
                 isEmailVerified = currentUser.isEmailVerified
             )
             onAuthSuccess(data)

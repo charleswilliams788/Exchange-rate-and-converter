@@ -149,7 +149,7 @@ fun AuthScreenCard(
                     Text(
                         text = when (authMode) {
                             AuthMode.SIGN_IN -> "Sign in to access your working balances & transfers"
-                            AuthMode.SIGN_UP -> "Join NairaRate to send, receive & exchange currencies"
+                            AuthMode.SIGN_UP -> "Join Veltro: Your Money. Without Borders."
                             AuthMode.FORGOT_PASSWORD -> "Enter your email to receive recovery instructions"
                         },
                         style = MaterialTheme.typography.bodySmall,
@@ -204,7 +204,7 @@ fun AuthScreenCard(
                     value = displayName,
                     onValueChange = { displayName = it; localValidationErr = null },
                     label = { Text("Full Name") },
-                    placeholder = { Text("e.g. Chiemelie Achu") },
+                    placeholder = { Text("e.g. John Doe") },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Person, contentDescription = null)
                     },
@@ -492,7 +492,7 @@ fun AuthScreenCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Quick Access: Demo Account (8144314093)",
+                    text = "Quick Access: Veltro Demo Wallet",
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface

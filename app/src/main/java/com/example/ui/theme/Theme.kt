@@ -11,35 +11,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = EmeraldPrimaryDark,
-    onPrimary = EmeraldOnPrimaryDark,
-    primaryContainer = EmeraldPrimaryContainerDark,
-    onPrimaryContainer = EmeraldOnPrimaryContainerDark,
-    secondary = AmberSecondaryDark,
-    onSecondary = AmberOnSecondaryDark,
-    secondaryContainer = AmberSecondaryContainerDark,
-    onSecondaryContainer = AmberOnSecondaryContainerDark,
-    background = DeepBackgroundDark,
-    onBackground = DeepOnBackgroundDark,
-    surface = DeepSurfaceDark,
-    onSurface = DeepOnSurfaceDark,
-    surfaceVariant = DeepSurfaceVariantDark,
-    onSurfaceVariant = DeepOnSurfaceVariantDark,
+    primary = ElectricBluePrimaryDark,
+    onPrimary = ElectricBlueOnPrimaryDark,
+    primaryContainer = ElectricBluePrimaryContainerDark,
+    onPrimaryContainer = ElectricBlueOnPrimaryContainerDark,
+    secondary = SlateSecondaryDark,
+    onSecondary = SlateOnSecondaryDark,
+    secondaryContainer = SlateSecondaryContainerDark,
+    onSecondaryContainer = SlateOnSecondaryContainerDark,
+    background = MidnightNavyBackgroundDark,
+    onBackground = MidnightNavyOnBackgroundDark,
+    surface = MidnightNavySurfaceDark,
+    onSurface = MidnightNavyOnSurfaceDark,
+    surfaceVariant = MidnightNavySurfaceVariantDark,
+    onSurfaceVariant = MidnightNavyOnSurfaceVariantDark,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = EmeraldPrimaryLight,
-    onPrimary = EmeraldOnPrimaryLight,
-    primaryContainer = EmeraldPrimaryContainerLight,
-    onPrimaryContainer = EmeraldOnPrimaryContainerLight,
-    secondary = AmberSecondaryLight,
-    onSecondary = AmberOnSecondaryLight,
-    secondaryContainer = AmberSecondaryContainerLight,
-    onSecondaryContainer = AmberOnSecondaryContainerLight,
-    background = SlateBackgroundLight,
-    onBackground = SlateOnBackgroundLight,
-    surface = SlateSurfaceLight,
-    onSurface = SlateOnSurfaceLight,
+    primary = ElectricBluePrimaryLight,
+    onPrimary = ElectricBlueOnPrimaryLight,
+    primaryContainer = ElectricBluePrimaryContainerLight,
+    onPrimaryContainer = ElectricBlueOnPrimaryContainerLight,
+    secondary = SlateSecondaryLight,
+    onSecondary = SlateOnSecondaryLight,
+    secondaryContainer = SlateSecondaryContainerLight,
+    onSecondaryContainer = SlateOnSecondaryContainerLight,
+    background = CoolWhiteBackgroundLight,
+    onBackground = CoolWhiteOnBackgroundLight,
+    surface = WhiteSurfaceLight,
+    onSurface = WhiteOnSurfaceLight,
     surfaceVariant = SlateSurfaceVariantLight,
     onSurfaceVariant = SlateOnSurfaceVariantLight,
 )
@@ -47,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Use our brand emerald-gold colors by default for consistent fintech identity
+    dynamicColor: Boolean = false, // Use our brand Electric Blue & Midnight Navy colors by default
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {

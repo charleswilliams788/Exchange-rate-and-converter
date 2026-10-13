@@ -1,6 +1,6 @@
 {
-  "name": "NairaRate",
-  "description": "Real-time USD to NGN currency converter with live market exchange rates, quick presets, and rate tracking.",
+  "name": "Veltro",
+  "description": "Veltro: Your Money. Without Borders. Modern currency converter and cryptocurrency wallet demonstration platform.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

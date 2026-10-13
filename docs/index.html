@@ -3,26 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NairaRate - Real-Time USD to NGN Converter & Wallet</title>
-  <meta name="description" content="Live Dollars to Naira currency converter with real-time exchange rates, send and receive working account, and banknote breakdown.">
+  <title>Veltro - Modern Currency Converter & Crypto Wallet Demo</title>
+  <meta name="description" content="Veltro: Your Money. Without Borders. Live USD to NGN converter, dual currency demo wallet, and multi-chain cryptocurrency deposit simulation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #008751;
-      --primary-dark: #00683e;
-      --primary-light: #e6f7ef;
-      --secondary: #b45309;
-      --secondary-light: #fef3c7;
-      --gold: #f59e0b;
-      --bg: #f8faf9;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --success: #10b981;
-      --danger: #ef4444;
+      --primary: #3B82F6; /* Electric Blue */
+      --primary-dark: #1D4ED8;
+      --primary-light: #EFF6FF;
+      --navy: #111827; /* Midnight Navy */
+      --navy-card: #1F2937;
+      --navy-border: #374151;
+      --secondary: #64748B; /* Slate Gray */
+      --bg: #F8FAFC; /* Cool White */
+      --card-bg: #FFFFFF;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --success: #10B981; /* Emerald Green */
+      --warning: #F59E0B;
+      --danger: #EF4444;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
       --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
       --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
@@ -71,36 +73,40 @@
     .logo-icon {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, #008751, #004d2e);
+      background: linear-gradient(135deg, #3B82F6, #1D4ED8);
       color: #fff;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
-      box-shadow: 0 4px 10px rgba(0, 135, 81, 0.3);
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
     }
 
     .logo-text h1 {
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      color: #0f172a;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .logo-text p {
       font-size: 12px;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .badge-live {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #e6f7ef;
-      color: #008751;
+      background: #EFF6FF;
+      color: #3B82F6;
+      border: 1px solid rgba(59, 130, 246, 0.2);
       padding: 6px 12px;
       border-radius: 20px;
       font-size: 12px;
@@ -110,7 +116,7 @@
     .pulse-dot {
       width: 8px;
       height: 8px;
-      background-color: #10b981;
+      background-color: #10B981;
       border-radius: 50%;
       animation: pulse 1.8s infinite;
     }
@@ -125,7 +131,7 @@
     .nav-tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      background: #e2e8f0;
+      background: #E2E8F0;
       padding: 4px;
       border-radius: 14px;
       gap: 4px;
@@ -138,7 +144,7 @@
       border-radius: 10px;
       font-size: 14px;
       font-weight: 700;
-      color: #64748b;
+      color: #64748B;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -148,8 +154,8 @@
     }
 
     .nav-tab.active {
-      background: #ffffff;
-      color: #008751;
+      background: #FFFFFF;
+      color: #3B82F6;
       box-shadow: var(--shadow-sm);
     }
 
@@ -164,9 +170,9 @@
 
     /* Rate Hero Card */
     .rate-hero {
-      background: linear-gradient(135deg, #008751 0%, #005a36 100%);
+      background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
       color: white;
-      border: none;
+      border: 1px solid var(--navy-border);
       position: relative;
       overflow: hidden;
     }
@@ -178,7 +184,7 @@
       right: -30px;
       width: 140px;
       height: 140px;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0) 70%);
       border-radius: 50%;
     }
 
@@ -204,7 +210,7 @@
 
     .rate-big-value span.curr {
       font-size: 26px;
-      color: #fde047;
+      color: #3B82F6;
     }
 
     .rate-hero-sub {
@@ -216,8 +222,8 @@
     }
 
     .btn-refresh {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.35);
       color: white;
       padding: 6px 12px;
       border-radius: 20px;
@@ -231,7 +237,7 @@
     }
 
     .btn-refresh:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(59, 130, 246, 0.35);
     }
 
     /* Converter Card */
@@ -254,13 +260,13 @@
       border: 1.5px solid var(--border);
       border-radius: 12px;
       padding: 10px 14px;
-      background: #fafafa;
+      background: #FAFAFA;
       transition: border-color 0.2s;
     }
 
     .currency-box:focus-within {
       border-color: var(--primary);
-      background: #ffffff;
+      background: #FFFFFF;
     }
 
     .flag-badge {
@@ -304,7 +310,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 10px rgba(0, 135, 81, 0.3);
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.35);
       transition: transform 0.3s ease;
     }
 
@@ -313,8 +319,8 @@
     }
 
     .result-box {
-      background: #e6f7ef;
-      border: 1.5px solid rgba(0, 135, 81, 0.25);
+      background: #EFF6FF;
+      border: 1.5px solid rgba(59, 130, 246, 0.25);
       border-radius: 12px;
       padding: 14px;
       display: flex;
@@ -326,12 +332,12 @@
     .result-amount {
       font-size: 26px;
       font-weight: 800;
-      color: #005a36;
+      color: #1D4ED8;
       font-family: 'Space Grotesk', sans-serif;
     }
 
     .btn-copy {
-      background: #008751;
+      background: #3B82F6;
       color: white;
       border: none;
       padding: 8px 14px;
@@ -349,21 +355,18 @@
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
+      padding: 4px 0 8px;
       scrollbar-width: none;
     }
-
-    .presets-row::-webkit-scrollbar {
-      display: none;
-    }
+    .presets-row::-webkit-scrollbar { display: none; }
 
     .chip {
-      background: #f1f5f9;
+      background: #F1F5F9;
       border: 1px solid var(--border);
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
       color: #334155;
       cursor: pointer;
       white-space: nowrap;
@@ -371,188 +374,150 @@
     }
 
     .chip:hover {
-      background: var(--primary-light);
-      color: var(--primary);
-      border-color: var(--primary);
+      background: #E2E8F0;
+      border-color: #CBD5E1;
     }
 
-    /* Banknote Denominations */
-    .denom-grid {
+    /* Banknotes breakdown */
+    .notes-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
       margin-top: 10px;
     }
 
-    .denom-item {
-      background: #f8fafc;
+    .note-card {
+      background: #F8FAFC;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 10px 8px;
       text-align: center;
     }
 
-    .denom-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .denom-val {
-      font-size: 18px;
+    .note-card .val {
+      font-size: 16px;
       font-weight: 800;
-      color: var(--primary);
+      color: var(--text);
     }
 
-    .denom-sub {
-      font-size: 10px;
+    .note-card .lbl {
+      font-size: 11px;
       color: var(--text-muted);
       margin-top: 2px;
-    }
-
-    /* Wallet Card */
-    .wallet-card {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: white;
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .wallet-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-
-    .acc-tag-badge {
-      background: rgba(255,255,255,0.1);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      color: #38bdf8;
       font-weight: 600;
     }
 
-    .wallet-balances {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
+    /* Simplified Midnight Navy Account Card */
+    .simplified-wallet-card {
+      background: var(--navy);
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      color: white;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
 
-    .bal-box {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .bal-label {
-      font-size: 12px;
-      color: #94a3b8;
+    .simplified-wallet-top {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
+      justify-content: space-between;
     }
 
-    .bal-amount {
-      font-size: 22px;
+    .brand-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60A5FA;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .user-email-chip {
+      background: rgba(255, 255, 255, 0.08);
+      color: #F8FAFC;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .user-email-chip:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Crypto Balances Overview inside Wallet */
+    .crypto-balances-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 8px;
+    }
+
+    .crypto-bal-pill {
+      background: rgba(31, 41, 55, 0.8);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .crypto-bal-lbl {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+
+    .crypto-bal-amt {
+      font-size: 14px;
       font-weight: 800;
+      color: #FFFFFF;
       font-family: 'Space Grotesk', sans-serif;
     }
 
-    .wallet-actions {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: white;
-      padding: 12px 6px;
+    /* Notice & Warning Banners */
+    .banner-demo {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E40AF;
+      padding: 10px 14px;
       border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .action-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Modal / Dialog */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 16px;
-    }
-
-    .modal-overlay.active {
+      font-size: 12px;
+      line-height: 1.45;
       display: flex;
+      align-items: flex-start;
+      gap: 8px;
     }
 
-    .modal-card {
-      background: white;
-      width: 100%;
-      max-width: 480px;
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
+    .banner-warning {
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      color: #B45309;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.45;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
+      align-items: flex-start;
+      gap: 8px;
     }
 
-    .modal-title {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .btn-close {
-      background: #f1f5f9;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #64748b;
-    }
-
+    /* Deposit Form Controls */
     .form-group {
       margin-bottom: 14px;
     }
@@ -560,24 +525,119 @@
     .form-label {
       font-size: 12px;
       font-weight: 700;
-      color: #475569;
+      color: var(--text-muted);
       margin-bottom: 6px;
       display: block;
     }
 
-    .form-input, .form-select {
+    .form-select, .form-input {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
+      padding: 11px 14px;
       border: 1.5px solid var(--border);
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      background: #FFFFFF;
+      color: var(--text);
       outline: none;
-      background: #fafafa;
+      transition: border-color 0.2s;
     }
 
-    .form-input:focus, .form-select:focus {
+    .form-select:focus, .form-input:focus {
       border-color: var(--primary);
-      background: #fff;
+    }
+
+    .address-card {
+      background: #F8FAFC;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .address-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .address-top span {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .address-box {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F172A;
+      word-break: break-all;
+      background: #FFFFFF;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #F1F5F9;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .info-lbl {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .info-val {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .status-awaiting {
+      background: #FEF3C7;
+      color: #B45309;
+    }
+
+    .status-pending {
+      background: #DBEAFE;
+      color: #1D4ED8;
+    }
+
+    .status-confirming {
+      background: #EDE9FE;
+      color: #6D28D9;
+    }
+
+    .status-completed {
+      background: #D1FAE5;
+      color: #047857;
     }
 
     .btn-submit {
@@ -585,26 +645,26 @@
       background: var(--primary);
       color: white;
       border: none;
-      padding: 14px;
+      padding: 13px;
       border-radius: 12px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      margin-top: 10px;
       transition: background 0.2s;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .btn-submit:hover {
       background: var(--primary-dark);
     }
 
-    /* Transactions */
+    /* Transactions Activity */
     .tx-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid #F1F5F9;
     }
 
     .tx-item:last-child {
@@ -620,203 +680,250 @@
     .tx-icon {
       width: 36px;
       height: 36px;
-      border-radius: 50%;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
+      font-weight: 800;
     }
 
-    .tx-icon.send { background: #fee2e2; color: #ef4444; }
-    .tx-icon.receive { background: #dcfce7; color: #10b981; }
-    .tx-icon.convert { background: #e0f2fe; color: #0284c7; }
+    .tx-icon.completed { background: #D1FAE5; color: #047857; }
+    .tx-icon.pending { background: #DBEAFE; color: #1D4ED8; }
+    .tx-icon.confirming { background: #EDE9FE; color: #6D28D9; }
+    .tx-icon.awaiting { background: #FEF3C7; color: #B45309; }
 
     .tx-title {
       font-size: 14px;
       font-weight: 700;
+      color: var(--text);
     }
 
     .tx-desc {
       font-size: 11px;
       color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .tx-amount {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
+      font-family: 'Space Grotesk', sans-serif;
       text-align: right;
     }
 
-    .tx-amount.pos { color: #10b981; }
-    .tx-amount.neg { color: #0f172a; }
+    .tx-amount.completed { color: #10B981; }
+    .tx-amount.pending { color: #3B82F6; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 440px;
+      padding: 22px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+
+    .btn-close {
+      background: #F1F5F9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 700;
+      color: #64748B;
+      cursor: pointer;
+    }
+
+    /* Auth Modal Tabs */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: #F1F5F9;
+      padding: 3px;
+      border-radius: 10px;
+      gap: 3px;
+      margin-bottom: 16px;
+    }
+
+    .auth-tab {
+      background: transparent;
+      border: none;
+      padding: 8px 6px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748B;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .auth-tab.active {
+      background: #FFFFFF;
+      color: #3B82F6;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    .btn-toggle-pwd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #94A3B8;
+    }
+
+    .btn-auth-header {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1D4ED8;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
     /* Toast */
     .toast {
       position: fixed;
       bottom: 24px;
-      background: #0f172a;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #111827;
       color: white;
-      padding: 10px 20px;
-      border-radius: 24px;
+      padding: 12px 22px;
+      border-radius: 30px;
       font-size: 13px;
       font-weight: 600;
       box-shadow: var(--shadow-lg);
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
+      transition: transform 0.3s ease;
       z-index: 2000;
+      pointer-events: none;
+      opacity: 0;
     }
 
     .toast.show {
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
       opacity: 1;
-    }
-
-    /* Auth & Profile Styles */
-    .auth-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 16px;
-    }
-    .auth-tab {
-      flex: 1;
-      padding: 10px;
-      text-align: center;
-      background: none;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-    .auth-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-    .password-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .password-wrap input {
-      padding-right: 42px;
-      width: 100%;
-    }
-    .btn-toggle-pwd {
-      position: absolute;
-      right: 12px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .user-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-    }
-    .btn-auth-header {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-    }
-    .form-msg-err {
-      color: #ef4444;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 4px;
-      display: none;
-    }
-    .form-msg-success {
-      color: #10b981;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 4px;
-      display: none;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
     <!-- Header -->
     <header>
       <div class="logo-area">
-        <div class="logo-icon">₦$</div>
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4l8 16 8-16"/>
+            <path d="M7 4h10"/>
+          </svg>
+        </div>
         <div class="logo-text">
-          <h1>NairaRate</h1>
-          <p>Real-Time Converter & Wallet</p>
+          <h1>Veltro</h1>
+          <p>Your Money. Without Borders.</p>
         </div>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <div class="badge-live">
-          <span class="pulse-dot"></span>
-          <span id="market-status">Live Market</span>
-        </div>
-        <div id="header-auth-area">
-          <!-- Auth / Profile Buttons injected via JS -->
-        </div>
+      <div id="header-auth-area">
+        <!-- Rendered by JS -->
       </div>
     </header>
 
-    <!-- Nav Tabs -->
+    <!-- Navigation Tabs -->
     <div class="nav-tabs">
       <button class="nav-tab active" id="tab-btn-converter" onclick="switchTab('converter')">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
-        Converter & Rates
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+        Converter
       </button>
       <button class="nav-tab" id="tab-btn-wallet" onclick="switchTab('wallet')">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="1.5"/></svg>
-        Account (Send & Receive)
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        Send & Receive
       </button>
     </div>
 
-    <!-- VIEW 1: CONVERTER & RATES -->
+    <!-- VIEW 1: CURRENCY CONVERTER -->
     <div id="view-converter" style="display: flex; flex-direction: column; gap: 16px;">
-      <!-- Rate Hero Card -->
-      <div class="card rate-hero">
+      <!-- Hero Rate Card -->
+      <div class="rate-hero card">
         <div class="rate-hero-top">
-          <span>Official Interbank Market Rate</span>
+          <span>Live Market Rate (USD/NGN)</span>
           <button class="btn-refresh" onclick="fetchLiveRates()">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Refresh
           </button>
         </div>
         <div class="rate-big-value">
           <span class="curr">₦</span><span id="hero-rate">1,530.00</span>
-          <span style="font-size: 16px; font-weight: 500; opacity: 0.85; margin-left: 6px;">/ 1 USD</span>
         </div>
         <div class="rate-hero-sub">
-          <span id="inverse-rate">1 NGN = $0.000653</span>
-          <span id="last-updated">Synced just now</span>
+          <span id="inverse-rate">1 NGN = $0.000654</span>
+          <span id="last-updated">Real-Time Data Feed</span>
         </div>
       </div>
 
-      <!-- Live Converter Card -->
+      <!-- Interactive Calculator Card -->
       <div class="card">
         <div class="input-group">
-          <label class="input-label" id="label-send">You Send / Convert</label>
+          <label class="input-label" id="label-send">You Send (USD)</label>
           <div class="currency-box">
             <span class="flag-badge" id="flag-from">🇺🇸</span>
             <span class="curr-code" id="code-from">USD</span>
@@ -825,58 +932,54 @@
         </div>
 
         <div class="swap-divider">
-          <button class="btn-swap" onclick="toggleCurrencyDirection()" title="Swap currencies">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+          <button class="btn-swap" onclick="toggleCurrencyDirection()" title="Swap conversion direction">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
           </button>
         </div>
 
         <div class="input-group">
-          <label class="input-label" id="label-receive">You Receive (Calculated)</label>
+          <label class="input-label" id="label-receive">You Receive (NGN)</label>
           <div class="result-box">
-            <div>
-              <span style="font-size: 16px; font-weight: 700; margin-right: 4px;" id="symbol-to">₦</span>
-              <span class="result-amount" id="result-amount">153,000.00</span>
+            <div class="result-amount">
+              <span id="symbol-to">₦</span><span id="result-amount">153,000.00</span>
             </div>
             <button class="btn-copy" onclick="copyResult()">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Copy
             </button>
           </div>
         </div>
 
-        <!-- Presets -->
-        <label class="input-label" style="margin-top: 14px;">Quick Presets</label>
-        <div class="presets-row" id="presets-container">
-          <!-- Injected via JS -->
-        </div>
-      </div>
-
-      <!-- Denomination Card -->
-      <div class="card" id="denom-card">
-        <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px;">Cash & Banknote Breakdown</div>
-        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">Payout in physical Nigerian banknotes</div>
-        <div class="denom-grid">
-          <div class="denom-item">
-            <div class="denom-title">₦1,000 Notes</div>
-            <div class="denom-val" id="denom-1000">153</div>
-            <div class="denom-sub" id="denom-1000-sub">notes</div>
-          </div>
-          <div class="denom-item">
-            <div class="denom-title">₦500 Notes</div>
-            <div class="denom-val" id="denom-500">0</div>
-            <div class="denom-sub">notes</div>
-          </div>
-          <div class="denom-item">
-            <div class="denom-title">₦100k Bundles</div>
-            <div class="denom-val" id="denom-bundles">1</div>
-            <div class="denom-sub">bundles</div>
+        <div style="margin-top: 14px;">
+          <span class="input-label">Quick Presets</span>
+          <div class="presets-row" id="presets-container">
+            <!-- Injected via JS -->
           </div>
         </div>
       </div>
 
-      <!-- Reference Table Card -->
+      <!-- Banknotes Estimation Card -->
       <div class="card">
-        <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Quick Conversion Lookup</div>
+        <span class="input-label">Banknotes Estimation (Cash Payout)</span>
+        <div class="notes-grid">
+          <div class="note-card">
+            <div class="val" id="denom-1000">153</div>
+            <div class="lbl">₦1,000 Notes</div>
+          </div>
+          <div class="note-card">
+            <div class="val" id="denom-500">0</div>
+            <div class="lbl">₦500 Notes</div>
+          </div>
+          <div class="note-card">
+            <div class="val" id="denom-bundles">1.5</div>
+            <div class="lbl">Standard Bundles</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversion Lookup Table -->
+      <div class="card">
+        <span class="input-label">Standard Conversion Reference</span>
         <div style="display: flex; flex-direction: column; gap: 8px;" id="lookup-table">
           <!-- Injected via JS -->
         </div>
@@ -887,69 +990,158 @@
     <div id="view-wallet" style="display: none; flex-direction: column; gap: 16px;">
       <!-- Auth Barrier for Unauthenticated Users -->
       <div id="auth-barrier-box" class="card" style="display: none; text-align: center; padding: 32px 20px;">
-        <div style="width: 60px; height: 60px; background: #e6f7ef; color: #008751; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <div style="width: 60px; height: 60px; background: #EFF6FF; color: #3B82F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
           <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #0f172a;">Protected Working Account</h2>
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #0F172A;">Protected Veltro Wallet</h2>
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5;">
-          Please sign in or create an account to access your <b>8144314093</b> dual-currency balances, send and receive money, and view transaction history.
+          Please sign in or create an account to access the multi-chain cryptocurrency deposit demonstration and track simulated transactions.
         </p>
         <div style="display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto;">
           <button class="btn-submit" onclick="openAuthModal('signin')" style="padding: 12px; font-size: 14px;">Sign In to Account</button>
-          <button onclick="openAuthModal('signup')" style="padding: 12px; background: #ffffff; border: 1.5px solid var(--border); color: #0f172a; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 14px;">Create Free Account</button>
-          <button onclick="loginAsDemoUser()" style="background: transparent; border: none; color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px; margin-top: 4px;">Explore Demo Account (8144314093)</button>
+          <button onclick="openAuthModal('signup')" style="padding: 12px; background: #FFFFFF; border: 1.5px solid var(--border); color: #0F172A; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 14px;">Create Free Account</button>
+          <button onclick="loginAsDemoUser()" style="background: transparent; border: none; color: var(--primary); font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px; margin-top: 4px;">Explore Demo Mode</button>
         </div>
       </div>
 
       <!-- Authenticated User Dashboard -->
       <div id="auth-wallet-box" style="display: flex; flex-direction: column; gap: 16px;">
-        <!-- Working Account Overview Card -->
-        <div class="wallet-card">
-          <div class="wallet-top">
-            <div>
-              <div style="font-size: 13px; color: #94a3b8; font-weight: 500;">NairaRate Virtual Account</div>
-              <div style="font-size: 18px; font-weight: 800; color: #fff; margin-top: 2px;" id="wallet-acc-num">8144314093</div>
-              <div style="font-size: 12px; color: #cbd5e1;" id="wallet-bank-name">NairaRate MFB • Bank</div>
-            </div>
-            <div class="acc-tag-badge" id="wallet-acc-tag" onclick="openProfileModal()" style="cursor: pointer;">@amelie</div>
-          </div>
-
-          <div class="wallet-balances">
-            <div class="bal-box">
-              <div class="bal-label"><span>🇳🇬</span> Naira Balance</div>
-              <div class="bal-amount" id="bal-ngn">₦250,000.00</div>
-            </div>
-            <div class="bal-box">
-              <div class="bal-label"><span>🇺🇸</span> Dollar Balance</div>
-              <div class="bal-amount" id="bal-usd">$200.00</div>
+        <!-- SIMPLIFIED ACCOUNT CARD (Bank info, virtual acc num, 250k & 200 balances REMOVED) -->
+        <div class="simplified-wallet-card">
+          <div class="simplified-wallet-top">
+            <span class="brand-chip">⚡ Veltro Multi-Chain Wallet (Demo)</span>
+            <div class="user-email-chip" id="wallet-card-user-email" onclick="openProfileModal()" title="View Profile">
+              user@example.com
             </div>
           </div>
 
-          <div class="wallet-actions">
-            <button class="action-btn" onclick="openModal('modal-send')">
-              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
-              Send
-            </button>
-            <button class="action-btn" onclick="openModal('modal-receive')">
-              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 7L7.8 16.2M7 7v9h9"/></svg>
-              Receive
-            </button>
-            <button class="action-btn" onclick="openModal('modal-convert')">
-              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              Convert
-            </button>
-            <button class="action-btn" onclick="addDemoFunds()">
-              <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-              Top Up
-            </button>
+          <!-- Demonstration Balances Grid (starts strictly at ZERO) -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: #94A3B8; letter-spacing: 0.5px;">DEMONSTRATION BALANCES</span>
+              <span style="font-size: 10px; color: #60A5FA; font-weight: 700;">Credited on Confirmation</span>
+            </div>
+            <div class="crypto-balances-row">
+              <div class="crypto-bal-pill">
+                <span class="crypto-bal-lbl">USDT</span>
+                <span class="crypto-bal-amt" id="bal-usdt">0.00</span>
+              </div>
+              <div class="crypto-bal-pill">
+                <span class="crypto-bal-lbl">ETH</span>
+                <span class="crypto-bal-amt" id="bal-eth">0.0000</span>
+              </div>
+              <div class="crypto-bal-pill">
+                <span class="crypto-bal-lbl">BNB</span>
+                <span class="crypto-bal-amt" id="bal-bnb">0.0000</span>
+              </div>
+              <div class="crypto-bal-pill">
+                <span class="crypto-bal-lbl">SOL</span>
+                <span class="crypto-bal-amt" id="bal-sol">0.0000</span>
+              </div>
+              <div class="crypto-bal-pill">
+                <span class="crypto-bal-lbl">USDC</span>
+                <span class="crypto-bal-amt" id="bal-usdc">0.00</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: #94A3B8; font-style: italic;">
+            Demonstration balance only. No real cryptocurrency is received, held, or transferred.
           </div>
         </div>
 
-        <!-- Account Transactions -->
+        <!-- CRYPTOCURRENCY DEPOSIT INTERFACE (DEMO MODE) -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div>
+              <h2 style="font-size: 17px; font-weight: 800; color: #0F172A;">Cryptocurrency Deposit</h2>
+              <p style="font-size: 12px; color: var(--text-muted);">Select asset & network to generate receiving address</p>
+            </div>
+            <span class="status-tag status-pending">DEMO MODE</span>
+          </div>
+
+          <!-- Warnings -->
+          <div class="banner-demo" style="margin-bottom: 12px;">
+            <span>ℹ️</span>
+            <div><b>DEMO MODE:</b> Deposit amounts, fees, and processing times are simulated. No actual blockchain transactions are performed.</div>
+          </div>
+
+          <div class="banner-warning" style="margin-bottom: 16px;">
+            <span>⚠️</span>
+            <div><b>Network Notice:</b> Only send the selected cryptocurrency through the selected network. Sending assets through an unsupported network may result in loss of funds.</div>
+          </div>
+
+          <!-- Asset Selection -->
+          <div class="form-group">
+            <label class="form-label">Select Cryptocurrency</label>
+            <select class="form-select" id="deposit-crypto-select" onchange="handleCryptoChange()">
+              <option value="USDT">USDT — Tether USD</option>
+              <option value="ETH">ETH — Ethereum</option>
+              <option value="BNB">BNB — BNB Smart Chain</option>
+              <option value="SOL">SOL — Solana</option>
+              <option value="USDC">USDC — USD Coin</option>
+            </select>
+          </div>
+
+          <!-- Network Selection -->
+          <div class="form-group">
+            <label class="form-label">Select Blockchain Network</label>
+            <select class="form-select" id="deposit-network-select" onchange="handleNetworkChange()">
+              <!-- Options populated dynamically based on crypto selection -->
+            </select>
+          </div>
+
+          <!-- Receiving Address Card -->
+          <div class="address-card">
+            <div class="address-top">
+              <span id="address-type-label">EVM RECEIVING ADDRESS</span>
+              <button class="btn-copy" onclick="copyDepositAddress()" style="padding: 5px 10px; font-size: 11px;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Address
+              </button>
+            </div>
+            <div class="address-box" id="deposit-address-display">0xe8c91f657af4706e570c8fbb396238db60d136da</div>
+            <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+              * Demonstration configuration address. The application does not monitor real on-chain transfers.
+            </div>
+          </div>
+
+          <!-- Deposit Parameters Information Grid -->
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-lbl">Minimum Deposit</span>
+              <span class="info-val" id="info-min-deposit">10 USDT</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Estimated Network Fee</span>
+              <span class="info-val" id="info-network-fee">~$0.20 (Gas in BNB)</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Estimated Processing Time</span>
+              <span class="info-val" id="info-est-time">~1-2 mins (15 blocks)</span>
+            </div>
+            <div class="info-item">
+              <span class="info-lbl">Deposit Status</span>
+              <span class="info-val"><span class="status-tag status-awaiting" id="info-status">Awaiting Deposit</span></span>
+            </div>
+          </div>
+
+          <!-- Simulated Deposit Amount Input Form -->
+          <div class="form-group">
+            <label class="form-label">Demonstration Deposit Amount</label>
+            <div style="position: relative;">
+              <input type="number" class="form-input" id="deposit-amount-input" placeholder="e.g. 50" min="0" step="any">
+              <span style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-weight: 700; color: var(--text-muted); font-size: 13px;" id="deposit-symbol-addon">USDT</span>
+            </div>
+          </div>
+
+          <button class="btn-submit" onclick="submitSimulatedDeposit()">Submit Demonstration Deposit</button>
+        </div>
+
+        <!-- Transaction History -->
         <div class="card">
           <div style="font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-            <span>Recent Activity</span>
-            <span style="font-size: 11px; color: var(--text-muted);">Real-time stream</span>
+            <span>Demonstration Activity History</span>
+            <span style="font-size: 11px; color: var(--text-muted);">Simulated Ledger</span>
           </div>
           <div id="tx-container">
             <!-- Injected via JS -->
@@ -995,11 +1187,11 @@
         <button type="submit" class="btn-submit" id="btn-submit-signin">Sign In</button>
       </form>
 
-      <!-- SIGN UP FORM -->
+      <!-- SIGN UP FORM (Placeholder changed to John Doe) -->
       <form id="form-signup" style="display: none;" onsubmit="handleSignUpSubmit(event)">
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="signup-name" placeholder="e.g. Chiemelie Achu" required>
+          <input type="text" class="form-input" id="signup-name" placeholder="e.g. John Doe" required>
         </div>
         <div class="form-group">
           <label class="form-label">Email Address</label>
@@ -1020,7 +1212,7 @@
           </div>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-          Your working account number (<b>8144314093</b>) and custom @tag will be generated upon registration.
+          Join Veltro to explore the currency converter and multi-chain cryptocurrency wallet demonstration.
         </div>
         <button type="submit" class="btn-submit" id="btn-submit-signup">Create Account</button>
       </form>
@@ -1028,7 +1220,7 @@
       <!-- FORGOT PASSWORD FORM -->
       <form id="form-forgot" style="display: none;" onsubmit="handleForgotSubmit(event)">
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
-          Enter your registered email address and we will send you secure password reset instructions.
+          Enter your registered email address to receive secure password reset instructions.
         </p>
         <div class="form-group">
           <label class="form-label">Email Address</label>
@@ -1042,7 +1234,7 @@
 
       <div style="margin-top: 14px; text-align: center; border-top: 1px solid var(--border); padding-top: 12px;">
         <button type="button" onclick="loginAsDemoUser(); closeModal('modal-auth');" style="background: transparent; border: none; font-size: 12px; font-weight: 700; color: var(--primary); cursor: pointer;">
-          Instant Access: Demo User (8144314093)
+          Instant Access: Explore Demo Mode
         </button>
       </div>
     </div>
@@ -1056,13 +1248,10 @@
         <button class="btn-close" onclick="closeModal('modal-profile')">✕</button>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 11px; font-weight: 800; color: var(--primary);">ACCOUNT NUMBER</span>
-          <button onclick="copyProfileAccount()" style="background: none; border: none; font-size: 11px; color: var(--primary); font-weight: 700; cursor: pointer;">Copy</button>
-        </div>
-        <div style="font-size: 20px; font-weight: 800; font-family: monospace; letter-spacing: 1px;" id="profile-acc-number">8144314093</div>
-        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="profile-email-display">user@example.com</div>
+      <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 14px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 2px;">AUTHENTICATED ACCOUNT</div>
+        <div style="font-size: 14px; font-weight: 700; color: #0F172A;" id="profile-email-display">user@example.com</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Veltro Demo Member</div>
       </div>
 
       <form id="form-profile" onsubmit="handleProfileUpdateSubmit(event)">
@@ -1071,134 +1260,13 @@
           <input type="text" class="form-input" id="profile-name" required>
         </div>
         <div class="form-group">
-          <label class="form-label">P2P Tag</label>
+          <label class="form-label">Wallet Tag / Username</label>
           <input type="text" class="form-input" id="profile-tag" required>
         </div>
-        <div class="form-group">
-          <label class="form-label">Bank Institution</label>
-          <input type="text" class="form-input" id="profile-bank" required>
-        </div>
-        <button type="submit" class="btn-submit" style="margin-bottom: 10px;">Save Profile Changes</button>
+        <button type="submit" class="btn-submit" style="margin-bottom: 10px;">Save Changes</button>
       </form>
 
-      <button onclick="handleLogout()" style="width: 100%; padding: 10px; background: #fee2e2; color: #ef4444; border: none; font-weight: 700; font-size: 13px; border-radius: 12px; cursor: pointer;">Sign Out of Account</button>
-    </div>
-  </div>
-
-  <!-- MODAL: SEND MONEY -->
-  <div class="modal-overlay" id="modal-send">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">Send Money</div>
-        <button class="btn-close" onclick="closeModal('modal-send')">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Currency to Send</label>
-        <select class="form-select" id="send-currency" onchange="updateSendPreview()">
-          <option value="NGN">🇳🇬 Nigerian Naira (₦)</option>
-          <option value="USD">🇺🇸 US Dollar ($)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Destination Bank / Method</label>
-        <select class="form-select" id="send-bank">
-          <option value="NairaRate P2P">NairaRate P2P / Tag (@tag)</option>
-          <option value="GTBank">Guaranty Trust Bank (GTBank)</option>
-          <option value="Access Bank">Access Bank</option>
-          <option value="Zenith Bank">Zenith Bank</option>
-          <option value="Kuda Bank">Kuda Bank</option>
-          <option value="OPay">OPay</option>
-          <option value="PalmPay">PalmPay</option>
-          <option value="First Bank">First Bank of Nigeria</option>
-          <option value="UBA">United Bank for Africa (UBA)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Recipient Account / Tag</label>
-        <input type="text" class="form-input" id="send-recipient-acc" placeholder="e.g. 0123456789 or @friend">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Recipient Name</label>
-        <input type="text" class="form-input" id="send-recipient-name" placeholder="e.g. Chiemelie Achu">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Amount</label>
-        <input type="number" class="form-input" id="send-amount" placeholder="0.00" oninput="updateSendPreview()">
-      </div>
-
-      <div id="send-preview-box" style="background: #f1f5f9; padding: 10px 14px; border-radius: 10px; font-size: 12px; color: #475569; margin-bottom: 12px; display: none;">
-      </div>
-
-      <button class="btn-submit" onclick="executeSendMoney()">Confirm & Send</button>
-    </div>
-  </div>
-
-  <!-- MODAL: RECEIVE MONEY -->
-  <div class="modal-overlay" id="modal-receive">
-    <div class="modal-card" style="text-align: center;">
-      <div class="modal-header">
-        <div class="modal-title">Receive Money</div>
-        <button class="btn-close" onclick="closeModal('modal-receive')">✕</button>
-      </div>
-
-      <!-- QR Badge -->
-      <div style="background: #e2e8f0; width: 140px; height: 140px; margin: 0 auto 16px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-        <svg width="90" height="90" viewBox="0 0 24 24" fill="none" stroke="#008751" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M10 3v4M3 10h4M10 14v4M17 10h4"/></svg>
-      </div>
-
-      <div style="font-size: 11px; font-weight: 800; color: #008751; letter-spacing: 1px; margin-bottom: 4px;">YOUR ACCOUNT NUMBER</div>
-      <div style="font-size: 32px; font-weight: 800; font-family: monospace; letter-spacing: 2px; color: #0f172a; margin-bottom: 14px;" id="modal-receive-acc">8144314093</div>
-
-      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px; font-size: 13px; text-align: left; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: var(--text-muted);">Bank Name:</span>
-          <span style="font-weight: 700;">NairaRate MFB</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: var(--text-muted);">Account Name:</span>
-          <span style="font-weight: 700;" id="modal-receive-name">Chiemelie Achu</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: var(--text-muted);">P2P Tag:</span>
-          <span style="font-weight: 700; color: var(--secondary);" id="modal-receive-tag">@amelie</span>
-        </div>
-      </div>
-
-      <button class="btn-submit" onclick="copyReceiveDetails()">Copy Account Details</button>
-    </div>
-  </div>
-
-  <!-- MODAL: CONVERT BALANCE -->
-  <div class="modal-overlay" id="modal-convert">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title">Convert Balance</div>
-        <button class="btn-close" onclick="closeModal('modal-convert')">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Swap Direction</label>
-        <select class="form-select" id="convert-direction" onchange="updateConvertPreview()">
-          <option value="USD_TO_NGN">USD ($) → NGN (₦)</option>
-          <option value="NGN_TO_USD">NGN (₦) → USD ($)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Amount to Convert</label>
-        <input type="number" class="form-input" id="convert-amount" placeholder="0.00" oninput="updateConvertPreview()">
-      </div>
-
-      <div id="convert-preview-box" style="background: #e6f7ef; border: 1px solid rgba(0, 135, 81, 0.2); padding: 12px; border-radius: 10px; font-size: 13px; margin-bottom: 14px;">
-        You will receive: <b>₦0.00</b>
-      </div>
-
-      <button class="btn-submit" onclick="executeConvertBalance()">Confirm Conversion</button>
+      <button onclick="handleLogout()" style="width: 100%; padding: 10px; background: #FEE2E2; color: #EF4444; border: none; font-weight: 700; font-size: 13px; border-radius: 12px; cursor: pointer;">Sign Out of Account</button>
     </div>
   </div>
 
@@ -1206,40 +1274,177 @@
   <div class="toast" id="toast-box">Copied to clipboard!</div>
 
   <script>
-    // State
+    // Configured Demonstration Addresses
+    const DEMO_ADDRESS_EVM = "0xe8c91f657af4706e570c8fbb396238db60d136da";
+    const DEMO_ADDRESS_SOLANA = "24RXeCxvZmfoo9gGMvhVM9dpf5m4yyXf9R8T3WdQmmvi";
+
+    // Structured Supported Asset and Network Options Configuration
+    const SUPPORTED_CRYPTO_OPTIONS = {
+      "USDT": [
+        {
+          networkId: "bsc",
+          networkName: "BNB Smart Chain (BEP-20)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "5 USDT",
+          minAmountNumeric: 5,
+          networkFee: "~$0.20 (Gas in BNB)",
+          estTime: "~1-2 mins (15 blocks)",
+          enabled: true
+        },
+        {
+          networkId: "eth",
+          networkName: "Ethereum (ERC-20)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "10 USDT",
+          minAmountNumeric: 10,
+          networkFee: "~$3.00 (Gas in ETH)",
+          estTime: "~3-5 mins (12 blocks)",
+          enabled: true
+        },
+        {
+          networkId: "trc20",
+          networkName: "Tron (TRC-20) — Coming Soon",
+          addressType: "TRON",
+          address: "Unsupported in Demo Mode",
+          minDeposit: "N/A",
+          minAmountNumeric: 0,
+          networkFee: "N/A",
+          estTime: "N/A",
+          enabled: false
+        }
+      ],
+      "ETH": [
+        {
+          networkId: "eth",
+          networkName: "Ethereum Mainnet (ERC-20 / Native)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "0.005 ETH",
+          minAmountNumeric: 0.005,
+          networkFee: "~$2.50 (0.0008 ETH)",
+          estTime: "~3-5 mins (12 blocks)",
+          enabled: true
+        },
+        {
+          networkId: "arbitrum",
+          networkName: "Arbitrum One (EVM L2)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "0.002 ETH",
+          minAmountNumeric: 0.002,
+          networkFee: "~$0.15 (0.00005 ETH)",
+          estTime: "~1 min",
+          enabled: true
+        }
+      ],
+      "BNB": [
+        {
+          networkId: "bsc",
+          networkName: "BNB Smart Chain (BEP-20 / Native)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "0.02 BNB",
+          minAmountNumeric: 0.02,
+          networkFee: "~$0.15 (0.0002 BNB)",
+          estTime: "~1-2 mins (15 blocks)",
+          enabled: true
+        }
+      ],
+      "SOL": [
+        {
+          networkId: "solana",
+          networkName: "Solana Network (Native)",
+          addressType: "SOLANA",
+          address: DEMO_ADDRESS_SOLANA,
+          minDeposit: "0.05 SOL",
+          minAmountNumeric: 0.05,
+          networkFee: "~$0.001 (0.000005 SOL)",
+          estTime: "~15-30 secs (32 confirmations)",
+          enabled: true
+        }
+      ],
+      "USDC": [
+        {
+          networkId: "arbitrum",
+          networkName: "Arbitrum One (EVM L2)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "5 USDC",
+          minAmountNumeric: 5,
+          networkFee: "~$0.10 (Gas in ETH)",
+          estTime: "~1 min",
+          enabled: true
+        },
+        {
+          networkId: "eth",
+          networkName: "Ethereum (ERC-20)",
+          addressType: "EVM",
+          address: DEMO_ADDRESS_EVM,
+          minDeposit: "10 USDC",
+          minAmountNumeric: 10,
+          networkFee: "~$3.00 (Gas in ETH)",
+          estTime: "~3-5 mins",
+          enabled: true
+        },
+        {
+          networkId: "solana",
+          networkName: "Solana Network (SPL)",
+          addressType: "SOLANA",
+          address: DEMO_ADDRESS_SOLANA,
+          minDeposit: "5 USDC",
+          minAmountNumeric: 5,
+          networkFee: "~$0.001 (0.000005 SOL)",
+          estTime: "~15-30 secs",
+          enabled: true
+        }
+      ]
+    };
+
+    // Application State
     let currentRate = 1530.00;
     let isUsdToNgn = true;
     let currentUser = null; // Stored user session
 
-    let wallet = {
-      accountNumber: "8144314093",
-      accountTag: "@amelie",
-      displayName: "Chiemelie Achu",
-      bankName: "NairaRate MFB",
-      ngnBalance: 250000.00,
-      usdBalance: 200.00,
-      transactions: [
-        { id: 1, type: "receive", title: "Welcome Deposit", desc: "Starter Balance", amount: "+₦250,000.00", isPos: true },
-        { id: 2, type: "receive", title: "USD Deposit", desc: "Starter Balance", amount: "+$200.00", isPos: true }
-      ]
+    // Demonstration Balances (STRICTLY STARTS AT ZERO FOR REAL / NEW USERS)
+    let cryptoBalances = {
+      USDT: 0.00,
+      ETH: 0.0000,
+      BNB: 0.0000,
+      SOL: 0.0000,
+      USDC: 0.00
     };
+
+    let userTransactions = [];
 
     // Load from LocalStorage if available
     try {
-      const savedUser = localStorage.getItem("nairarate_user");
+      const savedUser = localStorage.getItem("veltro_user") || localStorage.getItem("nairarate_user");
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
       }
     } catch(e){}
 
-    const savedWallet = localStorage.getItem("nairarate_wallet");
-    if (savedWallet) {
-      try { wallet = JSON.parse(savedWallet); } catch(e){}
-    }
+    try {
+      const savedBalances = localStorage.getItem("veltro_balances");
+      if (savedBalances) {
+        cryptoBalances = JSON.parse(savedBalances);
+      }
+    } catch(e){}
 
-    function saveWallet() {
-      localStorage.setItem("nairarate_wallet", JSON.stringify(wallet));
-      renderWallet();
+    try {
+      const savedTxs = localStorage.getItem("veltro_transactions");
+      if (savedTxs) {
+        userTransactions = JSON.parse(savedTxs);
+      }
+    } catch(e){}
+
+    function saveBalancesAndTxs() {
+      localStorage.setItem("veltro_balances", JSON.stringify(cryptoBalances));
+      localStorage.setItem("veltro_transactions", JSON.stringify(userTransactions));
+      renderBalances();
+      renderTransactions();
     }
 
     // AUTHENTICATION & SECURITY SYSTEM
@@ -1253,7 +1458,7 @@
 
     function getStoredUsers() {
       try {
-        const raw = localStorage.getItem("nairarate_registered_users");
+        const raw = localStorage.getItem("veltro_registered_users") || localStorage.getItem("nairarate_registered_users");
         return raw ? JSON.parse(raw) : [];
       } catch(e) {
         return [];
@@ -1261,13 +1466,14 @@
     }
 
     function saveStoredUsers(users) {
-      localStorage.setItem("nairarate_registered_users", JSON.stringify(users));
+      localStorage.setItem("veltro_registered_users", JSON.stringify(users));
     }
 
     function renderAuthUI() {
       const headerArea = document.getElementById("header-auth-area");
       const barrierBox = document.getElementById("auth-barrier-box");
       const walletBox = document.getElementById("auth-wallet-box");
+      const userEmailDisplay = document.getElementById("wallet-card-user-email");
 
       if (currentUser) {
         // Show user avatar pill & sign out button in header
@@ -1275,13 +1481,16 @@
           <div style="display: flex; align-items: center; gap: 6px;">
             <div class="user-pill" onclick="openProfileModal()" title="View and Edit Profile">
               <span>👤</span>
-              <span id="header-user-tag">${wallet.accountTag || currentUser.tag || '@amelie'}</span>
+              <span id="header-user-tag">${currentUser.name || currentUser.tag || currentUser.email.split('@')[0]}</span>
             </div>
-            <button class="btn-auth-header" onclick="handleLogout()" style="background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5;">
+            <button class="btn-auth-header" onclick="handleLogout()" style="background: #FEE2E2; color: #EF4444; border: 1px solid #FCA5A5;">
               Sign Out
             </button>
           </div>
         `;
+        if (userEmailDisplay) {
+          userEmailDisplay.innerText = currentUser.email || "user@example.com";
+        }
         if (barrierBox) barrierBox.style.display = "none";
         if (walletBox) walletBox.style.display = "flex";
       } else {
@@ -1312,7 +1521,7 @@
       document.getElementById("form-forgot").style.display = tab === "forgot" ? "block" : "none";
 
       document.getElementById("auth-modal-title").innerText = 
-        tab === "signin" ? "Sign In to Account" : (tab === "signup" ? "Register Account" : "Reset Password");
+        tab === "signin" ? "Sign In to Veltro" : (tab === "signup" ? "Register Veltro Account" : "Reset Password");
 
       clearAuthMessages();
     }
@@ -1321,9 +1530,9 @@
       const box = document.getElementById("auth-msg-box");
       box.innerText = msg;
       box.style.display = "block";
-      box.style.background = isSuccess ? "#e6f7ef" : "#fef2f2";
-      box.style.color = isSuccess ? "#008751" : "#dc2626";
-      box.style.border = isSuccess ? "1px solid #a7f3d0" : "1px solid #fecaca";
+      box.style.background = isSuccess ? "#EFF6FF" : "#FEF2F2";
+      box.style.color = isSuccess ? "#1D4ED8" : "#DC2626";
+      box.style.border = isSuccess ? "1px solid #BFDBFE" : "1px solid #FECACA";
     }
 
     function clearAuthMessages() {
@@ -1356,7 +1565,6 @@
       const users = getStoredUsers();
       const existingUser = users.find(u => u.email.toLowerCase() === email);
 
-      // Verify credentials or check demo user
       if (existingUser) {
         if (existingUser.passwordHash === passHash) {
           currentUser = {
@@ -1365,10 +1573,7 @@
             name: existingUser.name,
             tag: existingUser.tag || "@" + existingUser.email.split("@")[0]
           };
-          wallet.displayName = currentUser.name;
-          wallet.accountTag = currentUser.tag;
-          localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
-          saveWallet();
+          localStorage.setItem("veltro_user", JSON.stringify(currentUser));
           renderAuthUI();
           closeModal('modal-auth');
           showToast(`Welcome back, ${currentUser.name}!`);
@@ -1377,13 +1582,6 @@
           setAuthMessage("Incorrect password. Please try again.");
           return;
         }
-      }
-
-      // Default fallback for demo / test credentials
-      if (email === "achuchiemelie2507@gmail.com" || email === "user@nairarate.com") {
-        loginAsDemoUser();
-        closeModal('modal-auth');
-        return;
       }
 
       setAuthMessage("No account found with this email. Please click Register to create one.");
@@ -1423,7 +1621,6 @@
         email: email,
         tag: tag,
         passwordHash: passHash,
-        accountNumber: "8144314093",
         createdAt: new Date().toISOString()
       };
 
@@ -1437,17 +1634,21 @@
         tag: newUser.tag
       };
 
-      wallet.displayName = newUser.name;
-      wallet.accountTag = newUser.tag;
-      wallet.accountNumber = "8144314093";
-      wallet.ngnBalance = 250000.00;
-      wallet.usdBalance = 200.00;
+      // Real new users start strictly with zero demonstration balance
+      cryptoBalances = {
+        USDT: 0.00,
+        ETH: 0.0000,
+        BNB: 0.0000,
+        SOL: 0.0000,
+        USDC: 0.00
+      };
+      userTransactions = [];
 
-      localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
-      saveWallet();
+      localStorage.setItem("veltro_user", JSON.stringify(currentUser));
+      saveBalancesAndTxs();
       renderAuthUI();
       closeModal('modal-auth');
-      showToast(`Welcome to NairaRate, ${newUser.name}!`);
+      showToast(`Welcome to Veltro, ${newUser.name}!`);
     }
 
     function handleForgotSubmit(e) {
@@ -1466,23 +1667,21 @@
 
     function loginAsDemoUser() {
       currentUser = {
-        id: "demo_user_1",
-        name: "Chiemelie Achu",
-        email: "achuchiemelie2507@gmail.com",
-        tag: "@amelie"
+        id: "demo_user",
+        name: "Demo Account",
+        email: "demo@veltro.org",
+        tag: "@demo"
       };
-      wallet.displayName = currentUser.name;
-      wallet.accountTag = currentUser.tag;
-      wallet.accountNumber = "8144314093";
-      localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
-      saveWallet();
+      localStorage.setItem("veltro_user", JSON.stringify(currentUser));
       renderAuthUI();
-      showToast("Logged in as Demo User (8144314093)!");
+      renderBalances();
+      renderTransactions();
+      showToast("Exploring Veltro in Demo Mode!");
     }
 
     function handleLogout() {
       currentUser = null;
-      localStorage.removeItem("nairarate_user");
+      localStorage.removeItem("veltro_user");
       renderAuthUI();
       closeModal('modal-profile');
       showToast("You have been signed out.");
@@ -1493,11 +1692,9 @@
         openAuthModal('signin');
         return;
       }
-      document.getElementById("profile-acc-number").innerText = wallet.accountNumber;
-      document.getElementById("profile-email-display").innerText = currentUser.email || "achuchiemelie2507@gmail.com";
-      document.getElementById("profile-name").value = wallet.displayName;
-      document.getElementById("profile-tag").value = wallet.accountTag;
-      document.getElementById("profile-bank").value = wallet.bankName;
+      document.getElementById("profile-email-display").innerText = currentUser.email || "demo@veltro.org";
+      document.getElementById("profile-name").value = currentUser.name || "Demo User";
+      document.getElementById("profile-tag").value = currentUser.tag || "@demo";
       openModal('modal-profile');
     }
 
@@ -1505,35 +1702,24 @@
       e.preventDefault();
       const newName = document.getElementById("profile-name").value.trim();
       let newTag = document.getElementById("profile-tag").value.trim();
-      const newBank = document.getElementById("profile-bank").value.trim();
 
-      if (!newName || !newTag || !newBank) {
+      if (!newName || !newTag) {
         return alert("All profile fields are required.");
       }
       if (!newTag.startsWith("@")) newTag = "@" + newTag;
 
-      wallet.displayName = newName;
-      wallet.accountTag = newTag;
-      wallet.bankName = newBank;
-
       if (currentUser) {
         currentUser.name = newName;
         currentUser.tag = newTag;
-        localStorage.setItem("nairarate_user", JSON.stringify(currentUser));
+        localStorage.setItem("veltro_user", JSON.stringify(currentUser));
       }
 
-      saveWallet();
       renderAuthUI();
       closeModal('modal-profile');
       showToast("Profile details updated successfully!");
     }
 
-    function copyProfileAccount() {
-      navigator.clipboard.writeText(wallet.accountNumber);
-      showToast("Copied account number 8144314093!");
-    }
-
-    // Real-Time Exchange Rate Fetcher
+    // Real-Time Exchange Rate Fetcher for Converter
     async function fetchLiveRates() {
       const hero = document.getElementById("hero-rate");
       const inverse = document.getElementById("inverse-rate");
@@ -1551,10 +1737,9 @@
           showToast("Live exchange rate updated!");
         }
       } catch (err) {
-        // Fallback
         hero.innerText = currentRate.toLocaleString('en-US', { minimumFractionDigits: 2 });
         inverse.innerText = "1 NGN = $" + (1 / currentRate).toFixed(6);
-        updated.innerText = "Offline Cached Rate";
+        updated.innerText = "Cached Live Rate";
       }
     }
 
@@ -1571,15 +1756,14 @@
       const formatted = result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       document.getElementById("result-amount").innerText = formatted;
 
-      // Update banknotes breakdown
       const nairaTotal = isUsdToNgn ? result : input;
       const totalNotes1000 = Math.floor(nairaTotal / 1000);
       const totalNotes500 = Math.floor((nairaTotal % 1000) / 500);
-      const totalBundles = Math.floor(totalNotes1000 / 100);
+      const totalBundles = (totalNotes1000 / 100).toFixed(1);
 
       document.getElementById("denom-1000").innerText = totalNotes1000.toLocaleString();
       document.getElementById("denom-500").innerText = totalNotes500.toLocaleString();
-      document.getElementById("denom-bundles").innerText = totalBundles.toLocaleString();
+      document.getElementById("denom-bundles").innerText = totalBundles;
     }
 
     function toggleCurrencyDirection() {
@@ -1636,14 +1820,14 @@
         row.style.display = "flex";
         row.style.justifyContent = "space-between";
         row.style.padding = "6px 0";
-        row.style.borderBottom = "1px solid #f1f5f9";
+        row.style.borderBottom = "1px solid #F1F5F9";
         row.style.cursor = "pointer";
         row.onclick = () => {
           if (!isUsdToNgn) toggleCurrencyDirection();
           document.getElementById("amount-input").value = usd;
           calculateConversion();
         };
-        row.innerHTML = `<span style="font-weight:600;">$${usd}</span><span style="font-weight:700; color:#008751;">₦${ngn}</span>`;
+        row.innerHTML = `<span style="font-weight:600;">$${usd}</span><span style="font-weight:700; color:#3B82F6;">₦${ngn}</span>`;
         container.appendChild(row);
       });
     }
@@ -1656,173 +1840,229 @@
       document.getElementById("view-wallet").style.display = tab === "wallet" ? "flex" : "none";
     }
 
-    // Wallet Operations
-    function renderWallet() {
-      document.getElementById("wallet-acc-num").innerText = wallet.accountNumber;
-      document.getElementById("modal-receive-acc").innerText = wallet.accountNumber;
-      document.getElementById("wallet-acc-tag").innerText = wallet.accountTag;
-      document.getElementById("modal-receive-tag").innerText = wallet.accountTag;
-      document.getElementById("modal-receive-name").innerText = wallet.displayName;
+    // CRYPTOCURRENCY DEPOSIT LOGIC
+    function getSelectedCrypto() {
+      return document.getElementById("deposit-crypto-select").value;
+    }
 
-      document.getElementById("bal-ngn").innerText = "₦" + wallet.ngnBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
-      document.getElementById("bal-usd").innerText = "$" + wallet.usdBalance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    function handleCryptoChange() {
+      const crypto = getSelectedCrypto();
+      const networkSelect = document.getElementById("deposit-network-select");
+      networkSelect.innerHTML = "";
 
+      const options = SUPPORTED_CRYPTO_OPTIONS[crypto] || [];
+      options.forEach(opt => {
+        const el = document.createElement("option");
+        el.value = opt.networkId;
+        el.innerText = opt.networkName;
+        if (!opt.enabled) {
+          el.disabled = true;
+        }
+        networkSelect.appendChild(el);
+      });
+
+      document.getElementById("deposit-symbol-addon").innerText = crypto;
+      handleNetworkChange();
+    }
+
+    function getCurrentNetworkOption() {
+      const crypto = getSelectedCrypto();
+      const networkId = document.getElementById("deposit-network-select").value;
+      const options = SUPPORTED_CRYPTO_OPTIONS[crypto] || [];
+      return options.find(o => o.networkId === networkId) || options[0];
+    }
+
+    function handleNetworkChange() {
+      const opt = getCurrentNetworkOption();
+      if (!opt) return;
+
+      document.getElementById("deposit-address-display").innerText = opt.address;
+      document.getElementById("address-type-label").innerText = 
+        opt.addressType === "SOLANA" ? "SOLANA RECEIVING ADDRESS" : "EVM-COMPATIBLE RECEIVING ADDRESS";
+
+      document.getElementById("info-min-deposit").innerText = opt.minDeposit;
+      document.getElementById("info-network-fee").innerText = opt.networkFee;
+      document.getElementById("info-est-time").innerText = opt.estTime;
+      document.getElementById("info-status").innerText = "Awaiting Deposit";
+      document.getElementById("info-status").className = "status-tag status-awaiting";
+    }
+
+    function copyDepositAddress() {
+      const addr = document.getElementById("deposit-address-display").innerText;
+      if (!addr || addr.includes("Unsupported")) {
+        return showToast("Address is not active for this option.");
+      }
+      navigator.clipboard.writeText(addr);
+      showToast("Deposit address copied to clipboard!");
+    }
+
+    // SIMULATED DEPOSIT WORKFLOW WITH DUPLICATE-CREDITING PROTECTION
+    function submitSimulatedDeposit() {
+      if (!currentUser) {
+        showToast("Please sign in to submit a demonstration deposit.");
+        openAuthModal('signin');
+        return;
+      }
+
+      const opt = getCurrentNetworkOption();
+      if (!opt || !opt.enabled) {
+        return alert("This cryptocurrency network option is currently disabled or unsupported.");
+      }
+
+      const crypto = getSelectedCrypto();
+      const amountInput = document.getElementById("deposit-amount-input");
+      const amt = parseFloat(amountInput.value);
+
+      if (isNaN(amt) || amt <= 0) {
+        return alert("Please enter a valid deposit amount greater than zero.");
+      }
+
+      if (amt < opt.minAmountNumeric) {
+        return alert(`Deposit amount must be at least the demonstration minimum of ${opt.minDeposit}.`);
+      }
+
+      const txId = "tx_" + Date.now() + "_" + Math.floor(Math.random()*1000);
+      const simulatedHash = opt.addressType === "SOLANA" 
+        ? "5k" + Math.random().toString(36).substring(2, 10) + "..." + Math.random().toString(36).substring(2, 6)
+        : "0x" + Math.random().toString(16).substring(2, 10) + "..." + Math.random().toString(16).substring(2, 6);
+
+      // Create Pending Transaction Record
+      const newTx = {
+        id: txId,
+        userEmail: currentUser.email,
+        crypto: crypto,
+        network: opt.networkName.split(" (")[0],
+        amount: amt,
+        amountFormatted: `+${amt} ${crypto}`,
+        status: "Pending",
+        txHash: simulatedHash,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: new Date().toLocaleDateString(),
+        isCredited: false // Crucial duplicate crediting guard
+      };
+
+      userTransactions.unshift(newTx);
+      amountInput.value = "";
+      saveBalancesAndTxs();
+
+      document.getElementById("info-status").innerText = "Pending";
+      document.getElementById("info-status").className = "status-tag status-pending";
+      showToast(`Simulated deposit initiated (${amt} ${crypto}). Awaiting confirmations...`);
+
+      // Deterministic Status Progression:
+      // 1. After 3s -> Confirming
+      setTimeout(() => {
+        advanceTransactionStatus(txId, "Confirming");
+      }, 3000);
+
+      // 2. After 7s -> Completed and Credited
+      setTimeout(() => {
+        advanceTransactionStatus(txId, "Completed");
+      }, 7000);
+    }
+
+    // Advancing status and applying strict crediting only once upon "Completed"
+    function advanceTransactionStatus(txId, newStatus) {
+      const tx = userTransactions.find(t => t.id === txId);
+      if (!tx) return;
+
+      tx.status = newStatus;
+
+      // UPDATE BALANCE ONLY AT COMPLETED STAGE, WITH DUPLICATE CREDITING GUARD
+      if (newStatus === "Completed" && !tx.isCredited) {
+        if (cryptoBalances[tx.crypto] !== undefined) {
+          cryptoBalances[tx.crypto] = parseFloat((cryptoBalances[tx.crypto] + tx.amount).toFixed(4));
+        } else {
+          cryptoBalances[tx.crypto] = tx.amount;
+        }
+        tx.isCredited = true; // Guarded against multiple executions
+        showToast(`Deposit confirmed! +${tx.amount} ${tx.crypto} credited to demonstration balance.`);
+      }
+
+      saveBalancesAndTxs();
+
+      // If active screen matches
+      const currentOpt = getCurrentNetworkOption();
+      if (currentOpt && currentOpt.crypto === tx.crypto) {
+        const statusEl = document.getElementById("info-status");
+        if (statusEl) {
+          statusEl.innerText = newStatus;
+          statusEl.className = "status-tag status-" + newStatus.toLowerCase();
+        }
+      }
+    }
+
+    function renderBalances() {
+      document.getElementById("bal-usdt").innerText = (cryptoBalances.USDT || 0).toFixed(2);
+      document.getElementById("bal-eth").innerText = (cryptoBalances.ETH || 0).toFixed(4);
+      document.getElementById("bal-bnb").innerText = (cryptoBalances.BNB || 0).toFixed(4);
+      document.getElementById("bal-sol").innerText = (cryptoBalances.SOL || 0).toFixed(4);
+      document.getElementById("bal-usdc").innerText = (cryptoBalances.USDC || 0).toFixed(2);
+    }
+
+    function renderTransactions() {
       const txBox = document.getElementById("tx-container");
       txBox.innerHTML = "";
-      wallet.transactions.forEach(tx => {
+
+      if (userTransactions.length === 0) {
+        txBox.innerHTML = `
+          <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 13px;">
+            No deposits yet. Select a cryptocurrency above to initiate a demonstration deposit.
+          </div>
+        `;
+        return;
+      }
+
+      userTransactions.forEach(tx => {
         const item = document.createElement("div");
         item.className = "tx-item";
+
+        const iconClass = tx.status ? tx.status.toLowerCase() : "completed";
+        const iconSymbol = tx.status === "Completed" ? "✓" : (tx.status === "Confirming" ? "⏳" : "•");
+
+        let actionHtml = "";
+        if (tx.status !== "Completed") {
+          actionHtml = `
+            <button onclick="advanceTransactionStatus('${tx.id}', 'Completed')" style="margin-left: 8px; font-size: 10px; background: #3B82F6; color: white; border: none; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-weight: 700;">
+              Fast-Forward ⚡
+            </button>
+          `;
+        }
+
         item.innerHTML = `
           <div class="tx-left">
-            <div class="tx-icon ${tx.type}">${tx.type === "send" ? "↑" : (tx.type === "receive" ? "↓" : "⇄")}</div>
+            <div class="tx-icon ${iconClass}">${iconSymbol}</div>
             <div>
-              <div class="tx-title">${tx.title}</div>
-              <div class="tx-desc">${tx.desc}</div>
+              <div class="tx-title">${tx.crypto} Deposit (${tx.network})</div>
+              <div class="tx-desc">${tx.timestamp} • Hash: ${tx.txHash}</div>
             </div>
           </div>
-          <div class="tx-amount ${tx.isPos ? "pos" : "neg"}">${tx.amount}</div>
+          <div style="text-align: right;">
+            <div class="tx-amount ${tx.status === 'Completed' ? 'completed' : 'pending'}">${tx.amountFormatted}</div>
+            <div style="margin-top: 2px;">
+              <span class="status-tag status-${iconClass}">${tx.status}</span>
+              ${actionHtml}
+            </div>
+          </div>
         `;
         txBox.appendChild(item);
       });
     }
 
-    function updateSendPreview() {
-      const curr = document.getElementById("send-currency").value;
-      const amt = parseFloat(document.getElementById("send-amount").value) || 0;
-      const box = document.getElementById("send-preview-box");
-      if (amt > 0) {
-        box.style.display = "block";
-        if (curr === "USD") {
-          const equiv = (amt * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2 });
-          box.innerHTML = `Recipient receives approximately <b>₦${equiv} NGN</b> at live rate.`;
-        } else {
-          const equiv = (amt / currentRate).toFixed(2);
-          box.innerHTML = `Equivalent to <b>$${equiv} USD</b> at live rate.`;
-        }
-      } else {
-        box.style.display = "none";
-      }
-    }
-
-    function executeSendMoney() {
-      const curr = document.getElementById("send-currency").value;
-      const bank = document.getElementById("send-bank").value;
-      const acc = document.getElementById("send-recipient-acc").value.trim();
-      const name = document.getElementById("send-recipient-name").value.trim() || acc;
-      const amt = parseFloat(document.getElementById("send-amount").value) || 0;
-
-      if (!acc) return alert("Please enter recipient account or tag");
-      if (amt <= 0) return alert("Please enter valid amount");
-
-      if (curr === "NGN" && wallet.ngnBalance < amt) return alert("Insufficient Naira balance");
-      if (curr === "USD" && wallet.usdBalance < amt) return alert("Insufficient Dollar balance");
-
-      if (curr === "NGN") wallet.ngnBalance -= amt;
-      else wallet.usdBalance -= amt;
-
-      wallet.transactions.unshift({
-        id: Date.now(),
-        type: "send",
-        title: "Sent to " + name,
-        desc: bank + " • Just now",
-        amount: (curr === "USD" ? "-$" : "-₦") + amt.toLocaleString('en-US', { minimumFractionDigits: 2 }),
-        isPos: false
-      });
-
-      saveWallet();
-      closeModal('modal-send');
-      showToast("Transfer sent successfully!");
-    }
-
-    function updateConvertPreview() {
-      const dir = document.getElementById("convert-direction").value;
-      const amt = parseFloat(document.getElementById("convert-amount").value) || 0;
-      const box = document.getElementById("convert-preview-box");
-      if (dir === "USD_TO_NGN") {
-        const equiv = (amt * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2 });
-        box.innerHTML = `You will receive: <b>₦${equiv} NGN</b>`;
-      } else {
-        const equiv = (amt / currentRate).toFixed(2);
-        box.innerHTML = `You will receive: <b>$${equiv} USD</b>`;
-      }
-    }
-
-    function executeConvertBalance() {
-      const dir = document.getElementById("convert-direction").value;
-      const amt = parseFloat(document.getElementById("convert-amount").value) || 0;
-
-      if (amt <= 0) return alert("Please enter amount");
-
-      if (dir === "USD_TO_NGN") {
-        if (wallet.usdBalance < amt) return alert("Insufficient USD balance");
-        const received = amt * currentRate;
-        wallet.usdBalance -= amt;
-        wallet.ngnBalance += received;
-        wallet.transactions.unshift({
-          id: Date.now(),
-          type: "convert",
-          title: "Converted $" + amt + " to ₦" + received.toFixed(0),
-          desc: "Live rate swap • Just now",
-          amount: "+₦" + received.toLocaleString('en-US', { minimumFractionDigits: 2 }),
-          isPos: true
-        });
-      } else {
-        if (wallet.ngnBalance < amt) return alert("Insufficient NGN balance");
-        const received = amt / currentRate;
-        wallet.ngnBalance -= amt;
-        wallet.usdBalance += received;
-        wallet.transactions.unshift({
-          id: Date.now(),
-          type: "convert",
-          title: "Converted ₦" + amt + " to $" + received.toFixed(2),
-          desc: "Live rate swap • Just now",
-          amount: "+$" + received.toFixed(2),
-          isPos: true
-        });
-      }
-
-      saveWallet();
-      closeModal('modal-convert');
-      showToast("Conversion completed!");
-    }
-
-    function addDemoFunds() {
-      wallet.ngnBalance += 50000;
-      wallet.transactions.unshift({
-        id: Date.now(),
-        type: "receive",
-        title: "Test Deposit",
-        desc: "Instant Top-Up • Just now",
-        amount: "+₦50,000.00",
-        isPos: true
-      });
-      saveWallet();
-      showToast("₦50,000 added to your account!");
-    }
-
-    // Modal controls with authentication security guards
+    // Modal controls
     function openModal(id) {
-      if ((id === "modal-send" || id === "modal-receive" || id === "modal-convert") && !currentUser) {
-        showToast("Protected feature. Please sign in first.");
-        openAuthModal('signin');
-        return;
-      }
       document.getElementById(id).classList.add("active");
     }
 
-    function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
 
     function copyResult() {
       const val = document.getElementById("result-amount").innerText;
       const sym = document.getElementById("symbol-to").innerText;
       navigator.clipboard.writeText(sym + val);
       showToast("Copied " + sym + val + " to clipboard!");
-    }
-
-    function copyReceiveDetails() {
-      const text = `NairaRate Account Details:\nAccount Number: ${wallet.accountNumber}\nBank: ${wallet.bankName}\nName: ${wallet.displayName}\nTag: ${wallet.accountTag}`;
-      navigator.clipboard.writeText(text);
-      showToast("Account details copied!");
     }
 
     function showToast(msg) {
@@ -1832,12 +2072,14 @@
       setTimeout(() => toast.classList.remove("show"), 2800);
     }
 
-    // Init
+    // Initialize application
     window.addEventListener("DOMContentLoaded", () => {
       renderPresets();
       fetchLiveRates();
       renderAuthUI();
-      renderWallet();
+      handleCryptoChange();
+      renderBalances();
+      renderTransactions();
     });
   </script>
 </body>

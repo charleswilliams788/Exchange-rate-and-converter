@@ -107,19 +107,16 @@ class WalletRepository(private val db: FirebaseFirestore?) {
                 }
             }
 
-            // Dedicated 10-digit account number (NUBAN)
-            val generatedAccountNumber = "8144314093"
-            val sanitizedTag = "@" + (email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "amelie" })
-
+            val sanitizedTag = "@" + (email.substringBefore("@").filter { it.isLetterOrDigit() }.ifEmpty { "user" })
             val newAccount = UserAccount(
                 userId = userId,
-                displayName = displayName.ifEmpty { "NairaRate User" },
+                displayName = displayName.ifEmpty { "Veltro User" },
                 email = email,
-                accountNumber = generatedAccountNumber,
+                accountNumber = "0xe8c91f657af4706e570c8fbb396238db60d136da",
                 accountTag = sanitizedTag,
-                bankName = "NairaRate MFB",
-                ngnBalance = 250000.0, // Starter working test balance: ₦250,000
-                usdBalance = 200.0     // Starter working test balance: $200
+                bankName = "Veltro Vault",
+                ngnBalance = 0.0,
+                usdBalance = 0.0
             )
 
             val payload = mapOf(
@@ -136,10 +133,6 @@ class WalletRepository(private val db: FirebaseFirestore?) {
             )
 
             docRef.set(payload).await()
-
-            // Also record a welcome deposit transaction
-            recordInitialDeposit(userId, newAccount)
-
             return@withContext Result.success(newAccount)
         } catch (e: Exception) {
             handleFirestoreError(e, OperationType.WRITE, docRef.path)
@@ -396,7 +389,7 @@ class WalletRepository(private val db: FirebaseFirestore?) {
                 "convertedCurrency" to currency,
                 "type" to "DEPOSIT",
                 "status" to "COMPLETED",
-                "note" to "Instant deposit via NairaRate Top-up",
+                "note" to "Instant deposit via Veltro Top-up",
                 "participants" to listOf(uid),
                 "createdAt" to FieldValue.serverTimestamp()
             )
